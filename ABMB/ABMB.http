@@ -1,0 +1,6 @@
+@ABMB_HostAddress = http://localhost:5029
+
+GET {{ABMB_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
