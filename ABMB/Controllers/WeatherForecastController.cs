@@ -20,24 +20,6 @@ public class WeatherForecastController : ControllerBase
         "Scorching",
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private readonly ILogger<WeatherForecastController> _logger;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
