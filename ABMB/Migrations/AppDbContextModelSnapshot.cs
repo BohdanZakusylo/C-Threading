@@ -103,6 +103,85 @@ namespace ABMB.Migrations
                     b.ToTable("Hotels");
                 });
 
+            modelBuilder.Entity("ABMB.Models.OldFlight", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AirTime")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ArrDelay")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ArrTime")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Carrier")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DepDelay")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DepTime")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Distance")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FlightNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Hour")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Minute")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("SchedArrTime")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SchedDepTime")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TailNum")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TimeHour")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OldFlights");
+                });
+
             modelBuilder.Entity("ABMB.Models.Taxi", b =>
                 {
                     b.Property<int>("Id")

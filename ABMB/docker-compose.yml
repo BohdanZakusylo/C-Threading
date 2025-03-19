@@ -10,14 +10,14 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=abmb;Username=postgres;Password=nhlstenden2025
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025
 
   db:
     image: postgres:14
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: nhlstenden2025
-      POSTGRES_DB: admb
+      POSTGRES_DB: abmbv2
     ports:
       - "5432:5432"
     volumes:

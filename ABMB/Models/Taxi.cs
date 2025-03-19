@@ -7,5 +7,4 @@ public class Taxi
     public string City { get; set; }
     public string Rating { get; set; }
     public string Price { get; set; }
-    
 }

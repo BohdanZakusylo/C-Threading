@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace ABMB.Controllers;
+
 [ApiController]
 [Route("api/hello")]
 public class HelloController : ControllerBase

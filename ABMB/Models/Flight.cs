@@ -13,5 +13,3 @@ public class Flight
     public string Airport { get; set; }
     public string Gate { get; set; }
 }
-    
-    
