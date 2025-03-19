@@ -1,0 +1,32 @@
+name: Build Run Check Coding Conventions
+
+on:
+  push:
+    branches: [dotnet-format]
+  pull_request: [dotnet-format]
+    branches: 
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install CSharpeir
+      run: dotnet tool install -g csharpier
+    
+    - name: Format the c3 code
+      run: dotnet csharpier ABMB/
+
+    - name: Set up GitBot
+      run: |
+        git config --global user.email "github-actions"
+        git config --global user.name "c3-format"
+
+    - name: Commit and push changes
+      run: |
+        git add .
+        git commit -m "Autoformat c3 files files by c3-format!"
+        git push
