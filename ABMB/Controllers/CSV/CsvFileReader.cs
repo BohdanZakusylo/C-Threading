@@ -16,12 +16,21 @@ namespace ABMB.Controllers
             _filePath = filePath;
         }
 
-        public IEnumerable<OldFlight> ReadCsvFile()
+        public IEnumerable<OldFlight> ReadFlightCsvFile()
         {
             using var reader = new StreamReader(_filePath);
             using var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture);
             var records = csv.GetRecords<OldFlight>();
             return records;
         }
+
+        public IEnumerable<Airbnb> ReadAirbnbCsvFile()
+        {
+            using var reader = new StreamReader(_filePath);
+            using var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture);
+            var records = csv.GetRecords<Airbnb>();
+            return records;
+        }
+        
     }
 }

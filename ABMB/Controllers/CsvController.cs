@@ -19,12 +19,29 @@ public class CsvController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PopolcateDatabaseFromCsv()
     {
-        try
+      try
         {
-            var records = await _csvService.ReadCsvFileAsync();
-            await _appDbContext.AddRangeAsync(records);
+            var flightRecords = await _csvService.ReadFlightCsvFileAsync();
+            var airbnbRecords = await _csvService.ReadAirbnbCsvFileAsync();
+
+            if ((flightRecords == null || !flightRecords.Any()) && (airbnbRecords == null || !airbnbRecords.Any()))
+            {
+                return BadRequest(new { message = "CSV files contain no valid records." });
+            }
+
+            if (flightRecords?.Any() == true)
+            {
+                await _appDbContext.AddRangeAsync(flightRecords);
+            }
+
+            if (airbnbRecords?.Any() == true)
+            {
+                await _appDbContext.AddRangeAsync(airbnbRecords);
+            }
+
             await _appDbContext.SaveChangesAsync();
-            return Ok(new { message = "Database populated" });
+
+            return Ok(new { message = "Database populated successfully." });
         }
         catch (Exception e)
         {

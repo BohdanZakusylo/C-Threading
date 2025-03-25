@@ -15,9 +15,14 @@ namespace ABMB.Controllers
             _csvReader = new CsvFileReader(filePath);
         }
 
-        public async Task<IEnumerable<OldFlight>> ReadCsvFileAsync()
+        public async Task<IEnumerable<OldFlight>> ReadFlightCsvFileAsync()
         {
-            return await Task.Run(() => _csvReader.ReadCsvFile());
+            return await Task.Run(() => _csvReader.ReadFlightCsvFile());
+        }
+
+         public async Task<IEnumerable<Airbnb>> ReadAirbnbCsvFileAsync()
+        {
+            return await Task.Run(() => _csvReader.ReadAirbnbCsvFile());
         }
     }
 }
