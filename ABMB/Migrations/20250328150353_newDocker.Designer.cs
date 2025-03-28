@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ABMB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250318142340_RecreateFlightsTablev3")]
-    partial class RecreateFlightsTablev3
+    [Migration("20250328150353_newDocker")]
+    partial class newDocker
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,14 +114,14 @@ namespace ABMB.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AirTime")
-                        .HasColumnType("integer");
+                    b.Property<double>("AirTime")
+                        .HasColumnType("double precision");
 
-                    b.Property<int>("ArrDelay")
-                        .HasColumnType("integer");
+                    b.Property<double>("ArrDelay")
+                        .HasColumnType("double precision");
 
-                    b.Property<int>("ArrTime")
-                        .HasColumnType("integer");
+                    b.Property<double>("ArrTime")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Carrier")
                         .IsRequired()
@@ -130,11 +130,11 @@ namespace ABMB.Migrations
                     b.Property<int>("Day")
                         .HasColumnType("integer");
 
-                    b.Property<int>("DepDelay")
-                        .HasColumnType("integer");
+                    b.Property<double>("DepDelay")
+                        .HasColumnType("double precision");
 
-                    b.Property<int>("DepTime")
-                        .HasColumnType("integer");
+                    b.Property<double>("DepTime")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Destination")
                         .IsRequired()
@@ -183,35 +183,6 @@ namespace ABMB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("OldFlights");
-                });
-
-            modelBuilder.Entity("ABMB.Models.Taxi", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Price")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Rating")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Taxis");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,35 +1,42 @@
-﻿using ABMB.Properties;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace ABMB.Controllers.CSV;
+
 [ApiController]
-[Route("api/addCsv")]
+[Route("api/upload")]
 public class CsvController : ControllerBase
 {
-    
     private readonly CsvService _csvService;
-    private readonly AppDbContext _appDbContext;
-    
-    public CsvController(CsvService csvService, AppDbContext appDbContext)
+
+    public CsvController(CsvService csvService)
     {
         _csvService = csvService;
-        _appDbContext = appDbContext;
     }
 
+
     [HttpPost]
-    public async Task<IActionResult> PopolcateDatabaseFromCsv()
+    public async Task<IActionResult> Post(IFormFile csvFile)
     {
-        try
+        if (csvFile != null && csvFile.Length > 0)
         {
-            var records = await _csvService.ReadCsvFileAsync();
-            await _appDbContext.AddRangeAsync(records);
-            await _appDbContext.SaveChangesAsync();
-            return Ok(new { message = "Database populated" });
+            await using var stream = csvFile.OpenReadStream();
+            try
+            {
+                var records = (await _csvService.ReadCsvFile(stream)).ToList();
+                return Ok(new { message = "Fields added successfully", data = records });
+            }
+            catch (ApplicationException e)
+            {
+                Console.WriteLine(e);
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500, new { message = "Internal error occurred.", details = e.Message });
+            }
         }
-        catch (Exception e)
-        {
-            return BadRequest(new { message = "An error occurred while processing the CSV file.", error = e.Message });
-        }
+
+        return BadRequest(new { message = "Please select a valid CSV file." });
     }
-    
 }
