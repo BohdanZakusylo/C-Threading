@@ -28,7 +28,8 @@ public class CsvService
                 csv.Context.RegisterClassMap<OldFlightMap>(); // Register the custom map
 
                 var records = new List<OldFlight>();
-                await foreach (var record in csv.GetRecordsAsync<OldFlight>()) records.Add(record);
+                await foreach (var record in csv.GetRecordsAsync<OldFlight>())
+                    records.Add(record);
                 foreach (var record in records)
                 {
                     var existingRecord = await _context.OldFlights.FindAsync(record.Id);
@@ -37,9 +38,9 @@ public class CsvService
                         await _context.OldFlights.AddAsync(record);
                     }
                 }
-                await  _context.OldFlights.AddRangeAsync(records);
+                await _context.OldFlights.AddRangeAsync(records);
                 await _context.SaveChangesAsync();
-                
+
                 Console.WriteLine("ok");
                 return records;
             }

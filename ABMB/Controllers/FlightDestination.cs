@@ -19,14 +19,14 @@ public class FlightDestination : ControllerBase
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri =
-                new Uri(
-                    "https://google-flights2.p.rapidapi.com/api/v1/searchFlights?departure_id=LAX&arrival_id=JFK&travel_class=ECONOMY&adults=1&show_hidden=1&currency=USD&language_code=en-US&country_code=US"),
+            RequestUri = new Uri(
+                "https://google-flights2.p.rapidapi.com/api/v1/searchFlights?departure_id=LAX&arrival_id=JFK&travel_class=ECONOMY&adults=1&show_hidden=1&currency=USD&language_code=en-US&country_code=US"
+            ),
             Headers =
             {
                 { "x-rapidapi-key", "12d042b15dmsh7a0c47e4051d94cp156254jsn787183a1d46f" },
-                { "x-rapidapi-host", "google-flights2.p.rapidapi.com" }
-            }
+                { "x-rapidapi-host", "google-flights2.p.rapidapi.com" },
+            },
         };
 
         using (var response = await client.SendAsync(request))
