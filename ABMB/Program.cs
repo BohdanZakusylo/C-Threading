@@ -1,24 +1,73 @@
-var builder = WebApplication.CreateBuilder(args);
+using ABMB.Properties;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
+namespace ABMB;
 
-builder.Services.AddControllers();
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+public class Program
 {
-    app.MapOpenApi();
+    public static void Main(string[] args)
+    {
+        var host = CreateHostBuilder(args).Build();
+        
+        // Apply migrations at startup
+        using (var scope = host.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var context = services.GetRequiredService<AppDbContext>();
+            context.Database.Migrate();
+        }
+
+        host.Run();
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseKestrel(options =>
+                {
+                    options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
+                    options.ListenAnyIP(8080);
+                });
+
+                webBuilder.UseStartup<Startup>();
+            });
 }
 
-app.UseHttpsRedirection();
+// You'll also need to create a Startup class
+public class Startup
+{
+    public IConfiguration Configuration { get; }
 
-app.UseAuthorization();
+    public Startup(IConfiguration configuration)
+    {
+        Configuration = configuration;
+    }
 
-app.MapControllers();
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Configure services
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
+        });
 
-app.Run();
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddControllers();
+        services.AddTransient<CsvService>();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        app.UseRouting();
+        app.UseStaticFiles();
+        app.UseAuthorization();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
+    }
+}
