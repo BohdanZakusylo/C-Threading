@@ -2,7 +2,7 @@ name: Build, Run & Check Coding Conventions
 
 on:
   push:
-    branches: [dotnet-format]
+    branches: [hotels]
   pull_request:
     branches: [hotels]
 
