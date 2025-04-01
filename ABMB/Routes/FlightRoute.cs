@@ -1,5 +1,3 @@
 ﻿namespace ABMB.Routes;
 
-public class FlightRoute
-{
-}
+public class FlightRoute { }
