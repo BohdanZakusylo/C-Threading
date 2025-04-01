@@ -9,7 +9,7 @@ public class Program
     public static void Main(string[] args)
     {
         var host = CreateHostBuilder(args).Build();
-        
+
         // Apply migrations at startup
         using (var scope = host.Services.CreateScope())
         {
@@ -54,7 +54,8 @@ public class Startup
         });
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+        );
 
         services.AddControllers();
         services.AddTransient<CsvService>();

@@ -13,7 +13,6 @@ public class CsvController : ControllerBase
         _csvService = csvService;
     }
 
-
     [HttpPost]
     public async Task<IActionResult> Post(IFormFile csvFile)
     {
@@ -33,7 +32,10 @@ public class CsvController : ControllerBase
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(500, new { message = "Internal error occurred.", details = e.Message });
+                return StatusCode(
+                    500,
+                    new { message = "Internal error occurred.", details = e.Message }
+                );
             }
         }
 
