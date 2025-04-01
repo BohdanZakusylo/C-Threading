@@ -39,7 +39,10 @@ public class HotelsController : ControllerBase
 
         foreach (var hotelData in handler.HotelsModelList)
         {
-            string? hotel_id = await htdr.RetreiveDestination(hotelData.CountryName!, hotelData.HotelName!);
+            string? hotel_id = await htdr.RetreiveDestination(
+                hotelData.CountryName!,
+                hotelData.HotelName!
+            );
 
             if (hotel_id != null)
             {

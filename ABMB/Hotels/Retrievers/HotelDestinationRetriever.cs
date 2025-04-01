@@ -13,7 +13,9 @@ namespace ABMB.Hotels
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query={HotelName.Replace(" ", "%20")}%{Destination.Replace(" ", "%20")}"),
+                RequestUri = new Uri(
+                    $"https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query={HotelName.Replace(" ", "%20")}%{Destination.Replace(" ", "%20")}"
+                ),
             };
 
             request.Headers.Add("x-rapidapi-key", apiKey);

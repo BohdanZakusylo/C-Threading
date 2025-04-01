@@ -7,14 +7,22 @@ namespace ABMB.Hotels
     {
         private readonly HttpClient client = new HttpClient();
 
-        private readonly List<string> lstfromDb = ["Kyiv City Hotel", "Ramada Encore Kyiv", "Central Dayflat Apartments", "Ukraine Hotel"];
+        private readonly List<string> lstfromDb =
+        [
+            "Kyiv City Hotel",
+            "Ramada Encore Kyiv",
+            "Central Dayflat Apartments",
+            "Ukraine Hotel",
+        ];
 
         public async Task<List<int>> RetrieveHotelIds(string id)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id={id}&search_type=CITY&arrival_date=2025-11-12&departure_date=2025-12-14&adults=1&children_age=0%2C17&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=EUR"),
+                RequestUri = new Uri(
+                    $"https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id={id}&search_type=CITY&arrival_date=2025-11-12&departure_date=2025-12-14&adults=1&children_age=0%2C17&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=EUR"
+                ),
                 Headers =
                 {
                     { "x-rapidapi-key", "" },
