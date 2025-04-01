@@ -4,7 +4,7 @@ on:
   push:
     branches: [dotnet-format]
   pull_request:
-    branches: [dotnet-format]
+    branches: [hotels]
 
 jobs:
   build:
