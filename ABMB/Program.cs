@@ -53,8 +53,11 @@ public class Startup
             options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
         });
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+       services.AddDbContext<AppDbContext>(options =>
+           options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+   
+       services.AddDbContextFactory<AppDbContext>(options =>
+           options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
         services.AddControllers();
         services.AddTransient<CsvService>();
