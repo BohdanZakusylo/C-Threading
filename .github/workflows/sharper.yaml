@@ -2,9 +2,9 @@ name: Build, Run & Check Coding Conventions
 
 on:
   push:
-    branches: [hotels]
+    branches: [develop]
   pull_request:
-    branches: [hotels]
+    branches: [develop]
 
 jobs:
   build:
