@@ -1,6 +1,6 @@
 ﻿namespace ABMB.Models;
 
-public class OldFlight
+public class Airbnb
 {
     public int Id { get; set; }
     public int Year { get; set; }

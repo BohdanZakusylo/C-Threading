@@ -9,12 +9,22 @@ public class AppDbContext : DbContext
     {
     }
     public DbSet<Hotel> Hotels { get; set; }
-    public DbSet<Taxi> Taxis { get; set; }
     public DbSet<OldFlight> OldFlights { get; set; }
     public DbSet<Flight> Flights { get; set; }
+    public DbSet<Airbnb> Airbnbs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025");
+    }
+
+      public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseNpgsql("Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"));
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder){
+        base.OnModelCreating(modelBuilder);
     }
 }
