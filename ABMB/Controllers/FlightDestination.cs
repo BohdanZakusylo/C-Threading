@@ -30,8 +30,6 @@ public class FlightDestination : ControllerBase
                           $"&adults={adults}" +
                           $"&show_hidden=1&currency=USD&language_code=en-US&country_code=US";
 
-        Console.WriteLine(uri);
-
         using var client = new HttpClient();
         var request = new HttpRequestMessage(HttpMethod.Get, uri);
         request.Headers.Add("x-rapidapi-key", "0b58d697b5msh673289dc2c33c80p1cea81jsn704862362afb");
