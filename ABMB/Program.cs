@@ -74,6 +74,7 @@ public class Startup
     {
         app.UseRouting();
         app.UseStaticFiles();
+        app.UseCors("AllowAll");
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
