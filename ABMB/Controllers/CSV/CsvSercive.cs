@@ -7,6 +7,7 @@ using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using System.Linq;
 
 // Include the namespace where the map resides
 
@@ -15,12 +16,17 @@ public class CsvService
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
     private readonly ILogger<CsvService> _logger;
     private const int BatchSize = 1000;
-
+    
+    //dynamically determine parallelism
+    private readonly int _maxDegreeOfParallelism;
+    
     public CsvService(IDbContextFactory<AppDbContext> contextFactory, ILogger<CsvService> logger)
     {
         _contextFactory = contextFactory;
         _logger = logger;
-
+        
+        _maxDegreeOfParallelism = Math.Min(8, Math.Max(2, (int)(Environment.ProcessorCount * 0.7)));
+        _logger.LogInformation($"CSV Service initialized with parallelism degree: {_maxDegreeOfParallelism}");
     }
 
     public async Task<IEnumerable<OldFlight>> ReadCsvFile(Stream fileStream)
@@ -34,46 +40,84 @@ public class CsvService
             {
                 csv.Context.RegisterClassMap<OldFlightMap>(); // Register the custom map
 
-                var records = new List<OldFlight>();
-                var batch = new List<OldFlight>();
-
+                // Read all records into memory first
+                _logger.LogInformation("Reading CSV records into memory");
+                
+                // Properly collect async records
+                var allRecords = new List<OldFlight>();
                 await foreach (var record in csv.GetRecordsAsync<OldFlight>())
                 {
-                    records.Add(record);
-                    batch.Add(record);
+                    allRecords.Add(record);
+                }
+                
+                _logger.LogInformation($"Read {allRecords.Count} records from CSV");
 
-                    if (batch.Count >= BatchSize)
+                // Create batches for parallel processing
+                var batches = CreateBatch(allRecords, BatchSize).ToList();
+                _logger.LogInformation($"Created {batches.Count} batches for processing");
+
+                // Instead of Parallel.ForEachAsync, use Task-based approach
+                var tasks = new List<Task>();
+                var results = new ConcurrentBag<OldFlight>();
+            
+                foreach (var batch in batches)
+                {
+                    var task = Task.Run(async () => 
                     {
-                        await SaveBatchAsync(batch);
-                        batch = new List<OldFlight>();
+                        try
+                        {
+                            await SaveBatchAsync(batch);
+                            foreach (var record in batch)
+                            {
+                                results.Add(record);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error processing batch with task");
+                        }
+                    });
+                
+                    tasks.Add(task);
+                
+                    // Optional: Limit concurrent tasks
+                    if (tasks.Count >= _maxDegreeOfParallelism)
+                    {
+                        await Task.WhenAny(tasks);
+                        tasks.RemoveAll(t => t.IsCompleted);
                     }
                 }
-
-                if (batch.Count > 0)
-                {
-                    await SaveBatchAsync(batch);
-                }
-
-                return records;
+            
+                // Wait for all remaining tasks to complete
+                await Task.WhenAll(tasks);
+                _logger.LogInformation($"Completed task-based processing, saved {results.Count} records");
+                return results;
             }
         }
         catch (HeaderValidationException e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "CSV file header is invalid");
             throw new ApplicationException("CSV file header is invalid.", e);
         }
         catch (TypeConverterException ex)
         {
-            Console.WriteLine(ex);
+            _logger.LogError(ex, "CSV file contains invalid data format");
             throw new ApplicationException("CSV file contains invalid data format.", ex);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error reading CSV file");
             throw new ApplicationException("Error reading CSV file", e);
         }
     }
 
+    private IEnumerable<List<OldFlight>> CreateBatch(List<OldFlight> allRecords, int batchSize)
+    {
+        for (int i = 0; i < allRecords.Count; i += batchSize)
+        {
+            yield return allRecords.Skip(i).Take(batchSize).ToList();
+        }
+    }
 
     private async Task SaveBatchAsync(List<OldFlight> batch)
     {
@@ -84,20 +128,21 @@ public class CsvService
                 try
                 {
                     var uniqueBatch = batch.GroupBy(f => f.Id).Select(g => g.First()).ToList();
+                    var batchIds = uniqueBatch.Select(f => f.Id).ToList();
+                    var existingFlights = await context.OldFlights.Where(f => batchIds.Contains(f.Id)).ToListAsync();
+                    
+                    var newRecords = uniqueBatch
+                        .Where(f => !existingFlights.Any(existing => existing.Id == f.Id))
+                        .ToList();
 
-                    foreach (var record in uniqueBatch)
+                    if (newRecords.Any())
                     {
-                        var existingRecord = await context.OldFlights
-                            .FirstOrDefaultAsync(f => f.Id == record.Id);
-
-                        if (existingRecord == null)
-                        {
-                            await context.OldFlights.AddAsync(record);
-                        }
+                        await context.OldFlights.AddRangeAsync(newRecords);
+                        await context.SaveChangesAsync();
                     }
-
-                    await context.SaveChangesAsync();
+                    
                     await transaction.CommitAsync();
+                    _logger.LogInformation($"Saved {newRecords.Count} records to database");
                 }
                 catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
                 {
