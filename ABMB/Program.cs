@@ -53,7 +53,15 @@ public class Startup
             options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
         });
 
-       services.AddDbContext<AppDbContext>(options =>
+        services.AddCors(options =>
+        {
+            options.AddPolicy(("AllowAll"), builder =>
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+        });
+
+    services.AddDbContext<AppDbContext>(options =>
            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
    
        services.AddDbContextFactory<AppDbContext>(options =>
