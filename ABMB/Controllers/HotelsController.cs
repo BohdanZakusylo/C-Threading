@@ -33,21 +33,15 @@ public class HotelsController : ControllerBase
     [HttpGet(Name = "GetHotels")]
     public async Task<IEnumerable<WeatherForecast>> Get()
     {
-        TestHandler handler = new();
-        HotelDestinationRetriever htdr = new();
-        HotelDataRetriever hdr = new();
+        HotelDestinationRetriever hdr = new();
+        HotelRetriever htr = new();
 
-        foreach (var hotelData in handler.HotelsModelList)
+        string hotelid = await hdr.RetreiveDestination("Kyiv");
+
+        if (hotelid == null)
         {
-            string? hotel_id = await htdr.RetreiveDestination(
-                hotelData.CountryName!,
-                hotelData.HotelName!
-            );
-
-            if (hotel_id != null)
-            {
-                await hdr.RetreiveHotelInfo(hotel_id);
-            }
+            var hotelIds = await htr.RetrieveHotelIds(hotelid);
+            Console.WriteLine(hotelIds);
         }
 
         return Enumerable

@@ -1,12 +1,13 @@
 using System;
 using System.Net.Http.Headers;
+using DotNetEnv;
 
 namespace ABMB.Hotels
 {
     public class HotelDataRetriever
     {
         private readonly HttpClient client = new HttpClient();
-
+        private readonly string apikey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
         public async Task RetreiveHotelInfo(string HotelId)
         {
             var request = new HttpRequestMessage
@@ -17,7 +18,7 @@ namespace ABMB.Hotels
                 ),
                 Headers =
                 {
-                    { "x-rapidapi-key", "" },
+                    { "x-rapidapi-key", apikey },
                     { "x-rapidapi-host", "booking-com15.p.rapidapi.com" },
                 },
             };
