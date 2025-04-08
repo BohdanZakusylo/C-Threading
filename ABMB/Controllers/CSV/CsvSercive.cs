@@ -30,86 +30,72 @@ public class CsvService
     }
 
     public async Task<IEnumerable<OldFlight>> ReadCsvFile(Stream fileStream)
+{
+    try
     {
-        try
-        {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture);
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture);
 
-            using (var reader = new StreamReader(fileStream))
-            using (var csv = new CsvReader(reader, config))
+        using (var reader = new StreamReader(fileStream))
+        using (var csv = new CsvReader(reader, config))
+        {
+            csv.Context.RegisterClassMap<OldFlightMap>(); // Register the custom map
+
+            // Read all records into memory first
+            _logger.LogInformation("Reading CSV records into memory");
+
+            var allRecords = new List<OldFlight>();
+            await foreach (var record in csv.GetRecordsAsync<OldFlight>())
             {
-                csv.Context.RegisterClassMap<OldFlightMap>(); // Register the custom map
-
-                // Read all records into memory first
-                _logger.LogInformation("Reading CSV records into memory");
-                
-                // Properly collect async records
-                var allRecords = new List<OldFlight>();
-                await foreach (var record in csv.GetRecordsAsync<OldFlight>())
-                {
-                    allRecords.Add(record);
-                }
-                
-                _logger.LogInformation($"Read {allRecords.Count} records from CSV");
-
-                // Create batches for parallel processing
-                var batches = CreateBatch(allRecords, BatchSize).ToList();
-                _logger.LogInformation($"Created {batches.Count} batches for processing");
-
-                // Instead of Parallel.ForEachAsync, use Task-based approach
-                var tasks = new List<Task>();
-                var results = new ConcurrentBag<OldFlight>();
-            
-                foreach (var batch in batches)
-                {
-                    var task = Task.Run(async () => 
-                    {
-                        try
-                        {
-                            await SaveBatchAsync(batch);
-                            foreach (var record in batch)
-                            {
-                                results.Add(record);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error processing batch with task");
-                        }
-                    });
-                
-                    tasks.Add(task);
-                
-                    // Optional: Limit concurrent tasks
-                    if (tasks.Count >= _maxDegreeOfParallelism)
-                    {
-                        await Task.WhenAny(tasks);
-                        tasks.RemoveAll(t => t.IsCompleted);
-                    }
-                }
-            
-                // Wait for all remaining tasks to complete
-                await Task.WhenAll(tasks);
-                _logger.LogInformation($"Completed task-based processing, saved {results.Count} records");
-                return results;
+                allRecords.Add(record);
             }
-        }
-        catch (HeaderValidationException e)
-        {
-            _logger.LogError(e, "CSV file header is invalid");
-            throw new ApplicationException("CSV file header is invalid.", e);
-        }
-        catch (TypeConverterException ex)
-        {
-            _logger.LogError(ex, "CSV file contains invalid data format");
-            throw new ApplicationException("CSV file contains invalid data format.", ex);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error reading CSV file");
-            throw new ApplicationException("Error reading CSV file", e);
+
+            _logger.LogInformation($"Read {allRecords.Count} records from CSV");
+
+            // Create batches for parallel processing
+            var batches = CreateBatch(allRecords, BatchSize).ToList();
+            _logger.LogInformation($"Created {batches.Count} batches for processing");
+
+            // Use PLINQ to process batches in parallel
+            var results = new ConcurrentBag<OldFlight>();
+
+            batches.AsParallel()
+                   .WithDegreeOfParallelism(_maxDegreeOfParallelism)
+                   .ForAll(batch =>
+                   {
+                       try
+                       {
+                           SaveBatchAsync(batch).Wait(); // Wait synchronously for batch save
+                           foreach (var record in batch)
+                           {
+                               results.Add(record);
+                           }
+                       }
+                       catch (Exception ex)
+                       {
+                           _logger.LogError(ex, "Error processing batch with PLINQ");
+                       }
+                   });
+
+            _logger.LogInformation($"Completed PLINQ processing, saved {results.Count} records");
+            return results;
         }
     }
+    catch (HeaderValidationException e)
+    {
+        _logger.LogError(e, "CSV file header is invalid");
+        throw new ApplicationException("CSV file header is invalid.", e);
+    }
+    catch (TypeConverterException ex)
+    {
+        _logger.LogError(ex, "CSV file contains invalid data format");
+        throw new ApplicationException("CSV file contains invalid data format.", ex);
+    }
+    catch (Exception e)
+    {
+        _logger.LogError(e, "Error reading CSV file");
+        throw new ApplicationException("Error reading CSV file", e);
+    }
+}
 
     private IEnumerable<List<OldFlight>> CreateBatch(List<OldFlight> allRecords, int batchSize)
     {
