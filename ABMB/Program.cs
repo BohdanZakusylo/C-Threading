@@ -72,6 +72,10 @@ public class Startup
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
         );
 
+        services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+        );
+
         services.AddControllers();
         services.AddTransient<CsvService>();
     }

@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 COPY ["ABMB.csproj", "./"]
+
 RUN dotnet restore "ABMB.csproj"
 
 COPY . .
@@ -22,6 +23,8 @@ RUN dotnet tool install --global dotnet-ef
 
 # Ensure the dotnet tools are on the PATH
 ENV PATH="$PATH:/root/.dotnet/tools"
+
+COPY Data ./Data
 
 COPY --from=publish /app/publish .
 COPY ["ABMB.csproj", "./"] 
