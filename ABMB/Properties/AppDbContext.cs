@@ -24,6 +24,13 @@ public class AppDbContext : DbContext
         }
     }
 
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseNpgsql("Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"));
+    }
+    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

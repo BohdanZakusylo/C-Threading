@@ -8,38 +8,31 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // Load .env first
-        DotNetEnv.Env.Load();
+        var host = CreateHostBuilder(args).Build();
+        
+        // Apply migrations at startup
+        using (var scope = host.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var context = services.GetRequiredService<AppDbContext>();
+            context.Database.Migrate();
+        }
 
-        var key = Environment.GetEnvironmentVariable("RAPID_API_KEY");
-
-        CreateHostBuilder(args).Build().Run();
+        host.Run();
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
-
-                // Get all .env variables and inject into IConfiguration
-                var envVars = Environment.GetEnvironmentVariables();
-                var dict = new Dictionary<string, string?>();
-                foreach (var key in envVars.Keys)
-                {
-                    var strKey = key?.ToString();
-                    var value = envVars[key]?.ToString();
-                    if (strKey != null && value != null)
-                        dict[strKey] = value;
-                }
-
-                config.AddInMemoryCollection(dict);
-            })
             .ConfigureWebHostDefaults(webBuilder =>
             {
+                webBuilder.UseKestrel(options =>
+                {
+                    options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
+                    options.ListenAnyIP(8080);
+                });
+
                 webBuilder.UseStartup<Startup>();
             });
-
 }
 
 // You'll also need to create a Startup class
@@ -50,14 +43,6 @@ public class Startup
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
-
-        // Option 1: via Environment
-        var keyFromEnv = Environment.GetEnvironmentVariable("RAPID_API_KEY");
-        Console.WriteLine("From ENV: " + keyFromEnv);
-
-        // Option 2: via IConfiguration
-        var keyFromConfig = configuration["RAPID_API_KEY"];
-        Console.WriteLine("From IConfiguration: " + keyFromConfig);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -69,12 +54,7 @@ public class Startup
         });
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
-        );
-
-        services.AddDbContextFactory<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
-        );
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
         services.AddControllers();
         services.AddTransient<CsvService>();
