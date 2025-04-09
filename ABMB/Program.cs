@@ -53,19 +53,9 @@ public class Startup
             options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
         });
 
-        services.AddCors(options =>
-        {
-            options.AddPolicy(("AllowAll"), builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-        });
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
-    services.AddDbContext<AppDbContext>(options =>
-           options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-   
-       services.AddDbContextFactory<AppDbContext>(options =>
-           options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
         services.AddControllers();
         services.AddTransient<CsvService>();
     }
@@ -74,7 +64,6 @@ public class Startup
     {
         app.UseRouting();
         app.UseStaticFiles();
-        app.UseCors("AllowAll");
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
