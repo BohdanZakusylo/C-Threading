@@ -29,7 +29,7 @@ public class CsvService
         _logger.LogInformation($"CSV Service initialized with parallelism degree: {_maxDegreeOfParallelism}");
     }
 
-    public async Task<IEnumerable<OldFlight>> ReadCsvFile(Stream fileStream)
+public async Task<IEnumerable<OldFlight>> ReadCsvFile(Stream fileStream)
 {
     try
     {
@@ -51,32 +51,86 @@ public class CsvService
 
             _logger.LogInformation($"Read {allRecords.Count} records from CSV");
 
-            // Create batches for parallel processing
+            // Create batches for thread processing
             var batches = CreateBatch(allRecords, BatchSize).ToList();
-            _logger.LogInformation($"Created {batches.Count} batches for processing");
+            _logger.LogInformation($"Created {batches.Count} batches for processing with {_maxDegreeOfParallelism} threads");
 
-            // Use PLINQ to process batches in parallel
+            // Results collection that is thread-safe
             var results = new ConcurrentBag<OldFlight>();
+            
+            // Use explicit threads to process batches
+            var threads = new List<Thread>();
+            var taskCompletionSource = new TaskCompletionSource();
+            var remainingBatches = new ConcurrentQueue<List<OldFlight>>(batches);
+            var completedThreads = 0;
+            var lockObj = new object();
 
-            batches.AsParallel()
-                   .WithDegreeOfParallelism(_maxDegreeOfParallelism)
-                   .ForAll(batch =>
-                   {
-                       try
-                       {
-                           SaveBatchAsync(batch).Wait(); // Wait synchronously for batch save
-                           foreach (var record in batch)
-                           {
-                               results.Add(record);
-                           }
-                       }
-                       catch (Exception ex)
-                       {
-                           _logger.LogError(ex, "Error processing batch with PLINQ");
-                       }
-                   });
+            // Create worker threads
+            for (int i = 0; i < _maxDegreeOfParallelism; i++)
+            {
+                var thread = new Thread(() =>
+                {
+                    try
+                    {
+                        _logger.LogInformation($"Thread {Thread.CurrentThread.ManagedThreadId} started");
+                        
+                        while (remainingBatches.TryDequeue(out var batch))
+                        {
+                            try
+                            {
+                                _logger.LogDebug($"Thread {Thread.CurrentThread.ManagedThreadId} processing batch of {batch.Count} records");
+                                
+                                // Need to use Wait() since we're in a thread method that can't be async
+                                SaveBatchAsync(batch).Wait();
+                                
+                                foreach (var record in batch)
+                                {
+                                    results.Add(record);
+                                }
+                                
+                                _logger.LogDebug($"Thread {Thread.CurrentThread.ManagedThreadId} completed batch");
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, $"Error in thread {Thread.CurrentThread.ManagedThreadId} while processing batch");
+                            }
+                        }
+                        
+                        _logger.LogInformation($"Thread {Thread.CurrentThread.ManagedThreadId} finished - no more batches");
+                        
+                        // Track completed threads and signal when all are done
+                        lock (lockObj)
+                        {
+                            completedThreads++;
+                            if (completedThreads == _maxDegreeOfParallelism)
+                            {
+                                taskCompletionSource.SetResult();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Unhandled exception in thread {Thread.CurrentThread.ManagedThreadId}");
+                        lock (lockObj)
+                        {
+                            completedThreads++;
+                            if (completedThreads == _maxDegreeOfParallelism)
+                            {
+                                taskCompletionSource.SetResult();
+                            }
+                        }
+                    }
+                });
+                
+                thread.IsBackground = true;
+                threads.Add(thread);
+                thread.Start();
+            }
 
-            _logger.LogInformation($"Completed PLINQ processing, saved {results.Count} records");
+            // Wait for all threads to complete
+            await taskCompletionSource.Task;
+            
+            _logger.LogInformation($"All {_maxDegreeOfParallelism} threads completed, saved {results.Count} records");
             return results;
         }
     }

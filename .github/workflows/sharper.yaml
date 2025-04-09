@@ -16,7 +16,7 @@
 
 #     - name: Install CSharpeir
 #       run: dotnet tool install -g csharpier
-    
+
 #     - name: Format the c3 code
 #       run: dotnet csharpier ABMB/
 

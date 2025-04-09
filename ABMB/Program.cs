@@ -9,7 +9,7 @@ public class Program
     public static void Main(string[] args)
     {
         var host = CreateHostBuilder(args).Build();
-        
+
         // Apply migrations at startup
         using (var scope = host.Services.CreateScope())
         {
@@ -21,8 +21,9 @@ public class Program
         host.Run();
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseKestrel(options =>
@@ -33,17 +34,18 @@ public class Program
 
                 webBuilder.UseStartup<Startup>();
             });
+    }
 }
 
 // You'll also need to create a Startup class
 public class Startup
 {
-    public IConfiguration Configuration { get; }
-
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
     }
+
+    public IConfiguration Configuration { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -55,17 +57,17 @@ public class Startup
 
         services.AddCors(options =>
         {
-            options.AddPolicy(("AllowAll"), builder =>
+            options.AddPolicy("AllowAll", builder =>
                 builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader());
         });
 
-    services.AddDbContext<AppDbContext>(options =>
-           options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-   
-       services.AddDbContextFactory<AppDbContext>(options =>
-           options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
         services.AddControllers();
         services.AddTransient<CsvService>();
     }
@@ -76,9 +78,6 @@ public class Startup
         app.UseStaticFiles();
         app.UseCors("AllowAll");
         app.UseAuthorization();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }
