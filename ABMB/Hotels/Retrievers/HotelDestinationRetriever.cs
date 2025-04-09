@@ -6,15 +6,15 @@ namespace ABMB.Hotels
 {
     public class HotelDestinationRetriever()
     {
-        private readonly string apiKey = "";
+        private readonly string apiKey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
 
-        public async Task<string?> RetreiveDestination(string Destination, string HotelName)
+        public async Task<string?> RetreiveDestination(string Destination)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(
-                    $"https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query={HotelName.Replace(" ", "%20")}%{Destination.Replace(" ", "%20")}"
+                    $"https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query={Destination.Replace(" ", "%20")}"
                 ),
             };
 
@@ -36,9 +36,9 @@ namespace ABMB.Hotels
                     foreach (var item in dataArray.EnumerateArray())
                     {
                         string searchType = item.GetProperty("search_type").GetString()!;
-                        string name = item.GetProperty("name").GetString()!;
+                        string city_name = item.GetProperty("city_name").GetString()!;
 
-                        if (searchType == "hotel" && name.Contains(HotelName))
+                        if (searchType == "city" && city_name.Equals(Destination))
                         {
                             return item.GetProperty("dest_id").GetString();
                         }
