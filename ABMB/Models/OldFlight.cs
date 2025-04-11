@@ -1,6 +1,6 @@
 ﻿namespace ABMB.Models;
 
-public class Airbnb
+public class OldFlight
 {
     public int Id { get; set; }
     public int Year { get; set; }
@@ -12,15 +12,18 @@ public class Airbnb
     public int ArrTime { get; set; }
     public int SchedArrTime { get; set; }
     public int ArrDelay { get; set; }
-    public string Carrier { get; set; }
+    public required string Carrier { get; set; }
     public int FlightNumber { get; set; }
-    public string TailNum { get; set; }
-    public string Origin { get; set; }
-    public string Destination { get; set; }
+    public required string TailNum { get; set; }
+    public required string Origin { get; set; }
+    public required string Destination { get; set; }
     public int AirTime { get; set; }
     public int Distance { get; set; }
     public int Hour { get; set; }
     public int Minute { get; set; }
-    public string TimeHour { get; set; }
-    public string Name { get; set; }
+    public required string TimeHour { get; set; }
+    public required string Name { get; set; }
+    public DateTime FlightDate { get; set; }
+    public int DepartureTime { get; set; }
+    public int ArrivalTime { get; set; }
 }

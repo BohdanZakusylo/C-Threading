@@ -1,0 +1,186 @@
+{
+  "requestId": "6fb1026e-908e-47f7-8241-a84673110ca1",
+  "results": [
+    {
+      "date": "2025-04-01",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-02",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-03",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-04",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-05",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-06",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-07",
+      "price": 13500,
+      "price_eur": 83,
+      "price_usd": 88
+    },
+    {
+      "date": "2025-04-08",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-09",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-10",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-11",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-12",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-13",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-14",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-15",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-16",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-17",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-18",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-19",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-20",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-21",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-22",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-23",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-24",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-25",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-26",
+      "price": 12150,
+      "price_eur": 75,
+      "price_usd": 79
+    },
+    {
+      "date": "2025-04-27",
+      "price": 0,
+      "price_eur": 0,
+      "price_usd": 0
+    },
+    {
+      "date": "2025-04-28",
+      "price": 0,
+      "price_eur": 0,
+      "price_usd": 0
+    },
+    {
+      "date": "2025-04-29",
+      "price": 12408,
+      "price_eur": 77,
+      "price_usd": 81
+    },
+    {
+      "date": "2025-04-30",
+      "price": 12408,
+      "price_eur": 77,
+      "price_usd": 81
+    }
+  ],
+  "currency": "EUR"
+}

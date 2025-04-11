@@ -3,13 +3,13 @@
 public class Flight
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string City { get; set; }
-    public string Rating { get; set; }
-    public string Price { get; set; }
-    public string Time { get; set; }
-    public string Date { get; set; }
-    public string Airline { get; set; }
-    public string Airport { get; set; }
-    public string Gate { get; set; }
+    public required string Name { get; set; }
+    public required string City { get; set; }
+    public required string Rating { get; set; }
+    public required string Price { get; set; }
+    public required string Time { get; set; }
+    public required string Date { get; set; }
+    public required string Airline { get; set; }
+    public required string Airport { get; set; }
+    public required string Gate { get; set; }
 }

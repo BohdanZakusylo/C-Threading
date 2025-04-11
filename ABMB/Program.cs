@@ -1,6 +1,9 @@
 using ABMB.Properties;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using ABMB.Controllers.CSV;
+using ABMB.Controllers;
+using Microsoft.Extensions.Logging;
 
 namespace ABMB;
 
@@ -8,21 +11,71 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var host = CreateHostBuilder(args).Build();
-        
-        // Apply migrations at startup
-        using (var scope = host.Services.CreateScope())
+        try
         {
-            var services = scope.ServiceProvider;
-            var context = services.GetRequiredService<AppDbContext>();
-            context.Database.Migrate();
-        }
+            var host = CreateHostBuilder(args).Build();
+            var logger = host.Services.GetRequiredService<ILogger<Program>>();
+            logger.LogInformation("Starting application...");
+            
+            // Apply migrations at startup with retry
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var maxRetries = 5;
+                var retryCount = 0;
+                var delay = 5000; // 5 seconds
 
-        host.Run();
+                while (retryCount < maxRetries)
+                {
+                    try
+                    {
+                        var context = services.GetRequiredService<AppDbContext>();
+                        logger.LogInformation($"Attempting database connection (attempt {retryCount + 1}/{maxRetries})...");
+                        context.Database.CanConnect();
+                        logger.LogInformation("Database connection successful");
+                        
+                        logger.LogInformation("Applying database migrations...");
+                        context.Database.Migrate();
+                        logger.LogInformation("Database migrations completed successfully");
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        retryCount++;
+                        logger.LogWarning($"Database connection attempt {retryCount} failed: {ex.Message}");
+                        
+                        if (retryCount == maxRetries)
+                        {
+                            logger.LogError(ex, "Failed to connect to database after all retry attempts");
+                            throw;
+                        }
+                        
+                        logger.LogInformation($"Waiting {delay/1000} seconds before next attempt...");
+                        Thread.Sleep(delay);
+                    }
+                }
+            }
+
+            logger.LogInformation("Application started successfully");
+            host.Run();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Application failed to start: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            throw;
+        }
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+                logging.AddDebug();
+                logging.SetMinimumLevel(LogLevel.Debug);
+            })
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseKestrel(options =>
@@ -67,7 +120,7 @@ public class Startup
        services.AddDbContextFactory<AppDbContext>(options =>
            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
         services.AddControllers();
-        services.AddTransient<CsvService>();
+        services.AddTransient<AirbnbCsvService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
