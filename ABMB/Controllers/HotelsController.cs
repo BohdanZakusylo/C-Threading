@@ -1,57 +1,27 @@
 using System.Threading.Tasks;
 using ABMB.Hotels;
+using ABMB.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 
 namespace ABMB.Controllers;
 
 [ApiController]
-[Route("/get/hotels")]
+[Route("/get/")]
 public class HotelsController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing",
-        "Bracing",
-        "Chilly",
-        "Cool",
-        "Mild",
-        "Warm",
-        "Balmy",
-        "Hot",
-        "Sweltering",
-        "Scorching",
-    };
+    private readonly AppDbContext _context;
 
-    private readonly ILogger<HotelsController> _logger;
-
-    public HotelsController(ILogger<HotelsController> logger)
+    public HotelsController(AppDbContext context)
     {
-        _logger = logger;
+        _context = context;
     }
 
-    [HttpGet(Name = "GetHotels")]
-    public async Task<IEnumerable<WeatherForecast>> Get()
+    [HttpGet("hotels")]
+    public async Task<string> Get()
     {
-        HotelDestinationRetriever hdr = new();
-        HotelRetriever htr = new();
-
-        string hotelid = await hdr.RetreiveDestination("Kyiv");
-
-        if (hotelid == null)
-        {
-            var hotelIds = await htr.RetrieveHotelIds(hotelid);
-            Console.WriteLine(hotelIds);
-        }
-
-        return Enumerable
-            .Range(1, 5)
-            .Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-            })
-            .ToArray();
+        HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
+        await hotelDataOperator.GetValidHotelIds();
+        return "Hello";
     }
 }

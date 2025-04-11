@@ -4,12 +4,9 @@ namespace ABMB.Hotels
 {
     public class ApiHotelModel
     {
-        private int Price
-        {
-            get { return Price; }
-            set { Price = (int)value; }
-        }
-        private string Url { get; set; }
-        private double AvgRoomSize;
+        public string Price { get; set; }
+        public string currency { get; set; }
+        public string Url { get; set; }
+        public int available_rooms;
     }
 }

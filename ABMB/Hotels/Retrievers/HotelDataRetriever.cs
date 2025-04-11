@@ -1,6 +1,4 @@
-using System;
-using System.Net.Http.Headers;
-using DotNetEnv;
+using System.Text.Json;
 
 namespace ABMB.Hotels
 {
@@ -8,7 +6,15 @@ namespace ABMB.Hotels
     {
         private readonly HttpClient client = new HttpClient();
         private readonly string apikey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
-        public async Task RetreiveHotelInfo(string HotelId)
+
+        public async Task OperateHotelModel(List<HotelModel> lstHotelModel)
+        {
+            foreach (HotelModel hotelModel in lstHotelModel)
+            {
+                hotelModel.ApiHotelModel = await this.RetreiveHotelInfo(hotelModel.id!.Value);
+            }
+        }
+        public async Task<ApiHotelModel> RetreiveHotelInfo(int HotelId)
         {
             var request = new HttpRequestMessage
             {
@@ -27,7 +33,31 @@ namespace ABMB.Hotels
                 response.EnsureSuccessStatusCode();
                 var body = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine(body);
+                if (body == null)
+                {
+                    throw new Exception("hotel id is incorrect");
+                }
+
+                Console.WriteLine(HotelId);
+
+                using JsonDocument doc = JsonDocument.Parse(body);
+                var root = doc.RootElement;
+                var data = root.GetProperty("data");
+                var url = data.GetProperty("url").GetString();
+                var avialableRooms = data.GetProperty("available_rooms").GetInt32();
+                var gross_amount = data.GetProperty("product_price_breakdown").GetProperty("gross_amount");
+                var price = gross_amount.GetProperty("amount_rounded").GetString();
+                var currency = gross_amount.GetProperty("currency").GetString();
+
+                ApiHotelModel apiHotelModel = new()
+                {
+                    Price = price,
+                    currency = currency,
+                    Url = url,
+                    available_rooms = avialableRooms
+                };
+
+                return apiHotelModel;
             }
         }
     }
