@@ -3,7 +3,7 @@
 namespace ABMB.Controllers.CSV;
 
 [ApiController]
-[Route("api/upload")]
+[Route("post/upload/flights")]
 public class CsvController : ControllerBase
 {
     private readonly CsvService _csvService;
