@@ -69,7 +69,7 @@ namespace ABMB.Hotels
                         var normalizedDbName = dbHotel.HotelName.ToLowerInvariant().Trim();
                         int distance = Levenshtein(normalizedApiName, normalizedDbName);
 
-                        if (distance <= 7) // not very accurate but still
+                        if (distance <= 6) // not very accurate but still
                         {
                             HotelModel hotelModel = new()
                             {
@@ -78,6 +78,7 @@ namespace ABMB.Hotels
                             };
 
                             lstHotelModel.Add(hotelModel);
+                            break;
                         }
                     }
 

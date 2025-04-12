@@ -18,10 +18,22 @@ public class HotelsController : ControllerBase
     }
 
     [HttpGet("hotels")]
-    public async Task<string> Get()
+    public async Task<IActionResult> Get()
     {
         HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
-        await hotelDataOperator.GetValidHotelIds();
-        return "Hello";
+        List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
+
+        var result = hotels.Select(h => new HotelReturnModel
+        {
+            price = h.ApiHotelModel.Price,
+            currency = h.ApiHotelModel.currency,
+            url = h.ApiHotelModel.Url,
+            availableRooms = h.ApiHotelModel.available_rooms,
+            countryName = h.dbHotel.countyName,
+            hotelName = h.dbHotel.HotelName,
+            phoneNumber = h.dbHotel.PhoneNumber
+        });
+
+        return Ok(result);
     }
 }

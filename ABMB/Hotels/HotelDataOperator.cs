@@ -32,7 +32,7 @@ namespace ABMB.Hotels
             return cityId;
         }
 
-        public async Task GetValidHotelIds()
+        public async Task<List<HotelModel>> GetValidHotelIds()
         {
             HotelRetriever hotelRetriever = new();
             HotelDataRetriever hotelDataRetriever = new();
@@ -43,10 +43,7 @@ namespace ABMB.Hotels
 
             await hotelDataRetriever.OperateHotelModel(readyHotels);
 
-            foreach (HotelModel hotelModel in readyHotels)
-            {
-                Console.WriteLine(hotelModel.id + " - " + hotelModel.dbHotel.HotelName + " - " + hotelModel.ApiHotelModel.Url);
-            }
+            return readyHotels;
         }
     }
 }

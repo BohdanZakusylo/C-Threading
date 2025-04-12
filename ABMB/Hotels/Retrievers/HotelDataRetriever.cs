@@ -38,23 +38,38 @@ namespace ABMB.Hotels
                     throw new Exception("hotel id is incorrect");
                 }
 
-                Console.WriteLine(HotelId);
-
                 using JsonDocument doc = JsonDocument.Parse(body);
                 var root = doc.RootElement;
-                var data = root.GetProperty("data");
-                var url = data.GetProperty("url").GetString();
-                var avialableRooms = data.GetProperty("available_rooms").GetInt32();
-                var gross_amount = data.GetProperty("product_price_breakdown").GetProperty("gross_amount");
-                var price = gross_amount.GetProperty("amount_rounded").GetString();
-                var currency = gross_amount.GetProperty("currency").GetString();
+                string? url = null;
+                int? availableRooms = null;
+                string? price = null;
+                string? currency = null;
+
+                if (root.TryGetProperty("data", out var data))
+                {
+                    if (data.TryGetProperty("url", out var urlProp))
+                        url = urlProp.GetString();
+
+                    if (data.TryGetProperty("available_rooms", out var roomsProp) && roomsProp.TryGetInt32(out var r))
+                        availableRooms = r;
+
+                    if (data.TryGetProperty("product_price_breakdown", out var ppb) &&
+                        ppb.TryGetProperty("gross_amount", out var ga))
+                    {
+                        if (ga.TryGetProperty("amount_rounded", out var priceProp))
+                            price = priceProp.GetString();
+
+                        if (ga.TryGetProperty("currency", out var currencyProp))
+                            currency = currencyProp.GetString();
+                    }
+                }
 
                 ApiHotelModel apiHotelModel = new()
                 {
                     Price = price,
                     currency = currency,
                     Url = url,
-                    available_rooms = avialableRooms
+                    available_rooms = availableRooms
                 };
 
                 return apiHotelModel;
