@@ -14,11 +14,18 @@ namespace ABMB.Hotels
 
         public List<Hotel> getHotelsDb(string destination)
         {
-            List<Hotel> hotelsFromDb = _context.Hotels
-            .Where(h => h.cityName.Equals(destination))
-            .ToList();
+            try
+            {
+                List<Hotel> hotelsFromDb = _context.Hotels
+                .Where(h => h.cityName.Equals(destination))
+                .ToList();
 
-            return hotelsFromDb;
+                return hotelsFromDb;
+            }
+            catch (Exception e)
+            {
+                throw new CustomHotelException("Hotels were not found in the database");
+            }
         }
     }
 }

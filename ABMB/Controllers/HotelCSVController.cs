@@ -21,15 +21,21 @@ public class HotelCSVController : ControllerBase
     [RequestSizeLimit(100_000_000)]
     public IActionResult ImportFromLocalFile(IFormFile csvFile)
     {
-        Console.WriteLine("I am here");
         if (csvFile == null || csvFile.Length == 0)
             return BadRequest(new { Message = "No CSV file uploaded." });
 
-        using var stream = csvFile.OpenReadStream();
+        try
+        {
+            using var stream = csvFile.OpenReadStream();
 
-        HotelCSVUploader hotelUploader = new(_contextFactory);
-        hotelUploader.InsertCSVUsingThreadPool(stream);
+            HotelCSVUploader hotelUploader = new(_contextFactory);
+            hotelUploader.InsertCSVUsingThreadPool(stream);
 
-        return Ok(new { Message = "hotels inserted from local file." });
+            return Ok(new { Message = "hotels inserted from local file." });
+        }
+        catch
+        {
+            return BadRequest("An error occured with the file");
+        }
     }
 }

@@ -8,13 +8,11 @@ namespace ABMB.Hotels
         public string destination;
         public string arrivalDate;
         public string departureDate;
-        private readonly AppDbContext _context;
         private HotelDbRetriever hotelDbRetriever;
 
         public HotelDataOperator(string destination, AppDbContext context, string arrivalDate, string departureDate)
         {
             this.destination = destination;
-            this._context = context;
             this.hotelDbRetriever = new(context);
             this.arrivalDate = arrivalDate;
             this.departureDate = departureDate;
@@ -26,7 +24,7 @@ namespace ABMB.Hotels
 
             if (cityId == null)
             {
-                throw new Exception("City Not Found");
+                throw new CustomHotelException("City Was Not Found");
             }
 
             return cityId;

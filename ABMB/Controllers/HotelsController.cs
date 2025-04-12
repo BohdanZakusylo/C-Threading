@@ -22,19 +22,30 @@ public class HotelsController : ControllerBase
     {
         // HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
         HotelDataOperator hotelDataOperator = new(destination, _context, arrivalDate, departureDate);
-        List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
-
-        var result = hotels.Select(h => new HotelReturnModel
+        try
         {
-            price = h.ApiHotelModel.Price,
-            currency = h.ApiHotelModel.currency,
-            url = h.ApiHotelModel.Url,
-            availableRooms = h.ApiHotelModel.available_rooms,
-            countryName = h.dbHotel.countyName,
-            hotelName = h.dbHotel.HotelName,
-            phoneNumber = h.dbHotel.PhoneNumber
-        });
+            List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
+            var result = hotels.Select(h => new HotelReturnModel
+            {
+                price = h.ApiHotelModel.Price,
+                currency = h.ApiHotelModel.currency,
+                url = h.ApiHotelModel.Url,
+                availableRooms = h.ApiHotelModel.available_rooms,
+                countryName = h.dbHotel.countyName,
+                hotelName = h.dbHotel.HotelName,
+                phoneNumber = h.dbHotel.PhoneNumber
+            });
 
-        return Ok(result);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            if (e is CustomHotelException)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return BadRequest("Something went wrong");
+        }
     }
 }

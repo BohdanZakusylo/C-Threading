@@ -50,8 +50,16 @@ namespace ABMB.Hotels
 
             using (var response = await client.SendAsync(request))
             {
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
+                var body = "";
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                    body = await response.Content.ReadAsStringAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new CustomHotelException("Incorrect Hotel Data");
+                }
 
                 using JsonDocument doc = JsonDocument.Parse(body);
                 var root = doc.RootElement;

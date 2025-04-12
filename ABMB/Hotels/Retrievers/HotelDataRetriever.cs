@@ -14,7 +14,7 @@ namespace ABMB.Hotels
                 hotelModel.ApiHotelModel = await this.RetreiveHotelInfo(hotelModel.id!.Value);
             }
         }
-        public async Task<ApiHotelModel> RetreiveHotelInfo(int HotelId)
+        public async Task<ApiHotelModel?> RetreiveHotelInfo(int HotelId)
         {
             var request = new HttpRequestMessage
             {
@@ -35,7 +35,7 @@ namespace ABMB.Hotels
 
                 if (body == null)
                 {
-                    throw new Exception("hotel id is incorrect");
+                    return null;
                 }
 
                 using JsonDocument doc = JsonDocument.Parse(body);
