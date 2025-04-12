@@ -70,6 +70,7 @@ public class Startup
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
         services.AddControllers();
         services.AddTransient<CsvService>();
+        services.AddScoped<AirbnbService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

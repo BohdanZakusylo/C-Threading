@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -7,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ABMB.Migrations
 {
     /// <inheritdoc />
-    public partial class Airbnb : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,11 +17,12 @@ namespace ABMB.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    AirbnbId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Rating = table.Column<double>(type: "double precision", nullable: false),
-                    Reviews = table.Column<int>(type: "integer", nullable: false),
+                    Rating = table.Column<string>(type: "text", nullable: false),
+                    Reviews = table.Column<string>(type: "text", nullable: false),
                     HostName = table.Column<string>(type: "text", nullable: false),
-                    HostId = table.Column<int>(type: "integer", nullable: false),
+                    HostId = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     Features = table.Column<string>(type: "text", nullable: false),
                     Amenities = table.Column<string>(type: "text", nullable: false),
@@ -37,8 +37,8 @@ namespace ABMB.Migrations
                     Toilets = table.Column<int>(type: "integer", nullable: false),
                     Bedrooms = table.Column<int>(type: "integer", nullable: false),
                     Studios = table.Column<int>(type: "integer", nullable: false),
-                    CheckIn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CheckOut = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CheckIn = table.Column<string>(type: "text", nullable: false),
+                    CheckOut = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

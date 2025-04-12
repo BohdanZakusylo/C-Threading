@@ -1,6 +1,5 @@
 ﻿using ABMB.Models;
 using Microsoft.EntityFrameworkCore;
-using Airbnb = ABMB.Migrations.Airbnb;
 
 namespace ABMB.Properties;
 
@@ -30,7 +29,6 @@ public class AppDbContext : DbContext
         services.AddDbContextFactory<AppDbContext>(options =>
             options.UseNpgsql("Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"));
     }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
