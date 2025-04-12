@@ -32,7 +32,7 @@ public class FlightDestination : ControllerBase
 
         using var client = new HttpClient();
         var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        request.Headers.Add("x-rapidapi-key", "0b58d697b5msh673289dc2c33c80p1cea81jsn704862362afb");
+        request.Headers.Add("x-rapidapi-key", "bbd470342dmsh7745d93e16a8151p12063fjsn458923265781");
         request.Headers.Add("x-rapidapi-host", "google-flights2.p.rapidapi.com");
 
         try
