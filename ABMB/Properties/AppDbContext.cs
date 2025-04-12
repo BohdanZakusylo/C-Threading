@@ -1,5 +1,6 @@
 ﻿using ABMB.Models;
 using Microsoft.EntityFrameworkCore;
+using Airbnb = ABMB.Migrations.Airbnb;
 
 namespace ABMB.Properties;
 
@@ -16,6 +17,7 @@ public class AppDbContext : DbContext
     public DbSet<Hotel> Hotels { get; set; }
     public DbSet<OldFlight> OldFlights { get; set; }
     public DbSet<Flight> Flights { get; set; }
+    public DbSet<Airbnb> Airbnbs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
