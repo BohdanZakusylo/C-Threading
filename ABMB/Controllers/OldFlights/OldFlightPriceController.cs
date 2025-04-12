@@ -2,10 +2,11 @@
 using ABMB.Models;
 using ABMB.Properties;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ABMB.Controllers;
 [ApiController]
-[Route("api/oldflightprice")]
+[Route("get/oldflightprice/price")]
 public class OldFlightPriceController : ControllerBase
 {
     private readonly AppDbContext _appContext;
@@ -16,29 +17,33 @@ public class OldFlightPriceController : ControllerBase
     }
 
     [HttpGet]
-    public Task<IEnumerable<OldFlight>> GetPrice([FromBody] FlightRequest flightRequest)
+    public async Task<IActionResult> GetPrice([FromBody] FlightRequest flightRequest)
     {
         if (flightRequest == null)
         {
-            return Task.FromResult<IEnumerable<OldFlight>>(new List<OldFlight>());
+            return BadRequest(new { message = "Invalid request. FlightRequest cannot be null." });
         }
 
         var departureId = flightRequest.DepartureId;
         var arrivalId = flightRequest.ArrivalId;
 
+    
         if (string.IsNullOrEmpty(departureId) || string.IsNullOrEmpty(arrivalId))
         {
-            return Task.FromResult<IEnumerable<OldFlight>>(new List<OldFlight>());
-        }
-        var flights = _appContext.OldFlights
-            .Where(f => f.Origin == departureId && f.Destination == arrivalId)
-            .ToList();
-        if (flights.Count == 0)
-        {
-            return Task.FromResult<IEnumerable<OldFlight>>(new List<OldFlight>());
+            return BadRequest(new { message = "DepartureId and ArrivalId are required." });
         }
 
-        return Task.FromResult<IEnumerable<OldFlight>>(flights);
+        var flights = await _appContext.OldFlights
+            .AsNoTracking()
+            .Where(f => f.Origin == departureId && f.Destination == arrivalId)
+            .ToListAsync();
+        
+        if (!flights.Any())
+        {
+            return NotFound(new { message = "No flights found for the given criteria." });
+        }
+
+        return Ok(flights);
     }
 
 
