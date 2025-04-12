@@ -18,10 +18,19 @@ public class HotelsController : ControllerBase
     }
 
     [HttpGet("hotels")]
-    public async Task<IActionResult> Get(string destination, string arrivalDate, string departureDate)
+    public async Task<IActionResult> Get(
+        string destination,
+        string arrivalDate,
+        string departureDate
+    )
     {
         // HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
-        HotelDataOperator hotelDataOperator = new(destination, _context, arrivalDate, departureDate);
+        HotelDataOperator hotelDataOperator = new(
+            destination,
+            _context,
+            arrivalDate,
+            departureDate
+        );
         try
         {
             List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
@@ -33,7 +42,7 @@ public class HotelsController : ControllerBase
                 availableRooms = h.ApiHotelModel.available_rooms,
                 countryName = h.dbHotel.countyName,
                 hotelName = h.dbHotel.HotelName,
-                phoneNumber = h.dbHotel.PhoneNumber
+                phoneNumber = h.dbHotel.PhoneNumber,
             });
 
             return Ok(result);

@@ -14,6 +14,7 @@ namespace ABMB.Hotels
                 hotelModel.ApiHotelModel = await this.RetreiveHotelInfo(hotelModel.id!.Value);
             }
         }
+
         public async Task<ApiHotelModel?> RetreiveHotelInfo(int HotelId)
         {
             var request = new HttpRequestMessage
@@ -50,11 +51,16 @@ namespace ABMB.Hotels
                     if (data.TryGetProperty("url", out var urlProp))
                         url = urlProp.GetString();
 
-                    if (data.TryGetProperty("available_rooms", out var roomsProp) && roomsProp.TryGetInt32(out var r))
+                    if (
+                        data.TryGetProperty("available_rooms", out var roomsProp)
+                        && roomsProp.TryGetInt32(out var r)
+                    )
                         availableRooms = r;
 
-                    if (data.TryGetProperty("product_price_breakdown", out var ppb) &&
-                        ppb.TryGetProperty("gross_amount", out var ga))
+                    if (
+                        data.TryGetProperty("product_price_breakdown", out var ppb)
+                        && ppb.TryGetProperty("gross_amount", out var ga)
+                    )
                     {
                         if (ga.TryGetProperty("amount_rounded", out var priceProp))
                             price = priceProp.GetString();
@@ -69,7 +75,7 @@ namespace ABMB.Hotels
                     Price = price,
                     currency = currency,
                     Url = url,
-                    available_rooms = availableRooms
+                    available_rooms = availableRooms,
                 };
 
                 return apiHotelModel;
