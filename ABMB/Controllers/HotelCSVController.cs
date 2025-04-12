@@ -7,7 +7,7 @@ using System.Globalization;
 using ABMB.Hotels;
 
 [ApiController]
-[Route("hotels/")]
+[Route("post/")]
 public class HotelCSVController : ControllerBase
 {
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
@@ -17,11 +17,18 @@ public class HotelCSVController : ControllerBase
         _contextFactory = contextFactory;
     }
 
-    [HttpPost("upload")]
-    public IActionResult ImportFromLocalFile()
+    [HttpPost("hotels")]
+    [RequestSizeLimit(100_000_000)]
+    public IActionResult ImportFromLocalFile(IFormFile csvFile)
     {
+        Console.WriteLine("I am here");
+        if (csvFile == null || csvFile.Length == 0)
+            return BadRequest(new { Message = "No CSV file uploaded." });
+
+        using var stream = csvFile.OpenReadStream();
+
         HotelCSVUploader hotelUploader = new(_contextFactory);
-        hotelUploader.InsertCSVUsingThreadPool();
+        hotelUploader.InsertCSVUsingThreadPool(stream);
 
         return Ok(new { Message = "hotels inserted from local file." });
     }

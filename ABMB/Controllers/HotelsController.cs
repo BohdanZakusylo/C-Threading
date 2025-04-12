@@ -18,9 +18,10 @@ public class HotelsController : ControllerBase
     }
 
     [HttpGet("hotels")]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(string destination, string arrivalDate, string departureDate)
     {
-        HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
+        // HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
+        HotelDataOperator hotelDataOperator = new(destination, _context, arrivalDate, departureDate);
         List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
 
         var result = hotels.Select(h => new HotelReturnModel

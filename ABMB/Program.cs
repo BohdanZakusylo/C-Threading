@@ -65,7 +65,7 @@ public class Startup
         // Configure services
         services.Configure<FormOptions>(options =>
         {
-            options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
+            options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
         });
 
         services.AddDbContext<AppDbContext>(options =>
