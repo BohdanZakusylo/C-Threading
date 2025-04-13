@@ -69,6 +69,7 @@ public class Startup
         services.AddDbContextFactory<AppDbContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
         services.AddControllers();
+        services.AddHttpClient();
         services.AddTransient<CsvService>();
         services.AddScoped<AirbnbService>();
     }

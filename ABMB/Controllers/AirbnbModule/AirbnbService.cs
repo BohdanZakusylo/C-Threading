@@ -10,8 +10,6 @@ using CsvHelper.TypeConversion;
 using System.Text;
 
 
-
-
 public class AirbnbService
 {
     private readonly IDbContextFactory<AppDbContext> _contextFactory;

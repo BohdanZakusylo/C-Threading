@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace ABMB.Controllers.Airbnb;
+namespace ABMB.Controllers.AirbnbModule;
 
 [ApiController]
 [Route("api/airbnb/upload")]
-public class AirbnbController : ControllerBase
+public class AirbnbCsvController : ControllerBase
 {
     private readonly AirbnbService _airbnbService;
+
     
-    public AirbnbController(AirbnbService airbnbService)
+    public AirbnbCsvController(AirbnbService airbnbService)
     {
         _airbnbService = airbnbService;
     }
@@ -73,4 +74,6 @@ public class AirbnbController : ControllerBase
             });
         }
     }
+
+
 }
