@@ -20,7 +20,7 @@ public class Program
 
         host.Run();
     }
-    
+
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration(
@@ -74,17 +74,19 @@ public class Startup
 
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+            options.AddPolicy(
+                "AllowAll",
+                builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+            );
         });
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+        );
 
         services.AddDbContextFactory<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+        );
         services.AddControllers();
         services.AddTransient<CsvService>();
     }
@@ -95,6 +97,9 @@ public class Startup
         app.UseStaticFiles();
         app.UseCors("AllowAll");
         app.UseAuthorization();
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

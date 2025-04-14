@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ABMB.Controllers;
+
 [ApiController]
 [Route("get/oldflightprice")]
 public class OldFlightPriceController : ControllerBase
@@ -32,8 +33,8 @@ public class OldFlightPriceController : ControllerBase
             return BadRequest(new { message = "DepartureId and ArrivalId are required." });
         }
 
-        var flights = await _appContext.OldFlights
-            .AsNoTracking()
+        var flights = await _appContext
+            .OldFlights.AsNoTracking()
             .Where(f => f.Origin == departureId && f.Destination == arrivalId)
             .ToListAsync();
 
@@ -49,6 +50,7 @@ public class OldFlightPriceController : ControllerBase
     {
         [Required]
         public string DepartureId { get; set; }
+
         [Required]
         public string ArrivalId { get; set; }
     }

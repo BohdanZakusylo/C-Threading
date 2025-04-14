@@ -5,13 +5,10 @@ namespace ABMB.Properties;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext()
-    {
-    }
+    public AppDbContext() { }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options) { }
 
     public DbSet<Hotel> Hotels { get; set; }
     public DbSet<OldFlight> OldFlights { get; set; }
@@ -20,15 +17,19 @@ public class AppDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
-            optionsBuilder.UseNpgsql("Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025");
+            optionsBuilder.UseNpgsql(
+                "Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"
+            );
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContextFactory<AppDbContext>(options =>
-            options.UseNpgsql("Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"));
+            options.UseNpgsql(
+                "Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"
+            )
+        );
     }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
