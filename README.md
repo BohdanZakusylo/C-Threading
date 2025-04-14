@@ -1,6 +1,6 @@
 # C-Threading
 
-#This is the project of our group for the C# Threading Class
+#This is the project of our group ABMB for the C# Threading Class
 
 
 ## Description
