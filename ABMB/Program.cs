@@ -9,7 +9,7 @@ public class Program
     public static void Main(string[] args)
     {
         var host = CreateHostBuilder(args).Build();
-
+        DotNetEnv.Env.Load();
         // Apply migrations at startup
         using (var scope = host.Services.CreateScope())
         {
@@ -30,6 +30,7 @@ public class Program
 
                     // Get all .env variables and inject into IConfiguration
                     var envVars = Environment.GetEnvironmentVariables();
+                    Console.WriteLine(envVars + "vars");
                     var dict = new Dictionary<string, string?>();
                     foreach (var key in envVars.Keys)
                     {
