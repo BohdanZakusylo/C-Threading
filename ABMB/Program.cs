@@ -18,28 +18,29 @@ public class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
-
-                // Get all .env variables and inject into IConfiguration
-                var envVars = Environment.GetEnvironmentVariables();
-                var dict = new Dictionary<string, string?>();
-                foreach (var key in envVars.Keys)
+            .ConfigureAppConfiguration(
+                (hostingContext, config) =>
                 {
-                    var strKey = key?.ToString();
-                    var value = envVars[key]?.ToString();
-                    if (strKey != null && value != null)
-                        dict[strKey] = value;
-                }
+                    DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
 
-                config.AddInMemoryCollection(dict);
-            })
+                    // Get all .env variables and inject into IConfiguration
+                    var envVars = Environment.GetEnvironmentVariables();
+                    var dict = new Dictionary<string, string?>();
+                    foreach (var key in envVars.Keys)
+                    {
+                        var strKey = key?.ToString();
+                        var value = envVars[key]?.ToString();
+                        if (strKey != null && value != null)
+                            dict[strKey] = value;
+                    }
+
+                    config.AddInMemoryCollection(dict);
+                }
+            )
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
             });
-
 }
 
 // You'll also need to create a Startup class

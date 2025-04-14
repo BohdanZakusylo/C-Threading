@@ -8,15 +8,20 @@ namespace ABMB.Hotels
     {
         private readonly HttpClient client = new HttpClient();
         private readonly string apiKey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
+
         public int Levenshtein(string a, string b)
         {
-            if (string.IsNullOrEmpty(a)) return b.Length;
-            if (string.IsNullOrEmpty(b)) return a.Length;
+            if (string.IsNullOrEmpty(a))
+                return b.Length;
+            if (string.IsNullOrEmpty(b))
+                return a.Length;
 
             var d = new int[a.Length + 1, b.Length + 1];
 
-            for (int i = 0; i <= a.Length; i++) d[i, 0] = i;
-            for (int j = 0; j <= b.Length; j++) d[0, j] = j;
+            for (int i = 0; i <= a.Length; i++)
+                d[i, 0] = i;
+            for (int j = 0; j <= b.Length; j++)
+                d[0, j] = j;
 
             for (int i = 1; i <= a.Length; i++)
             {
@@ -25,13 +30,20 @@ namespace ABMB.Hotels
                     int cost = a[i - 1] == b[j - 1] ? 0 : 1;
                     d[i, j] = Math.Min(
                         Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
-                        d[i - 1, j - 1] + cost);
+                        d[i - 1, j - 1] + cost
+                    );
                 }
             }
 
             return d[a.Length, b.Length];
         }
-        public async Task<List<HotelModel>> RetrieveHotelIds(string id, List<Hotel> hotelsFromDb, string arrivalDate, string departureDate)
+
+        public async Task<List<HotelModel>> RetrieveHotelIds(
+            string id,
+            List<Hotel> hotelsFromDb,
+            string arrivalDate,
+            string departureDate
+        )
         {
             var request = new HttpRequestMessage
             {
@@ -82,14 +94,13 @@ namespace ABMB.Hotels
                             HotelModel hotelModel = new()
                             {
                                 dbHotel = dbHotel,
-                                id = hotel.GetProperty("hotel_id").GetInt32()
+                                id = hotel.GetProperty("hotel_id").GetInt32(),
                             };
 
                             lstHotelModel.Add(hotelModel);
                             break;
                         }
                     }
-
                 }
 
                 return lstHotelModel;
