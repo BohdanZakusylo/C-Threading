@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ABMB.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250408154804_ChangedHotelModel")]
-    partial class ChangedHotelModel
+    [Migration("20250412173853_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,99 @@ namespace ABMB.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ABMB.Models.Airbnb", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("AirbnbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Amenities")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Bathrooms")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Bedrooms")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Beds")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CheckIn")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CheckOut")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Features")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Guests")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("HostId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HostName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HouseRules")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImgLinks")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Rating")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reviews")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SafetyRules")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Studios")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Toilets")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Airbnbs");
+                });
 
             modelBuilder.Entity("ABMB.Models.Flight", b =>
                 {

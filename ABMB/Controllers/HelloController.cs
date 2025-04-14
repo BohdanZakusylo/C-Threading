@@ -13,12 +13,18 @@ public class HelloController : ControllerBase
         _csvService = csvService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Post(IFormFile csvFile)
+    [HttpGet]
+    public IActionResult Get()
     {
-        if (csvFile != null && csvFile.Length > 0)
-            return Ok("Hello World");
-
-        return Ok("not World");
+        return Ok(new { message = "Hello from ABMB API!" });
     }
+
+    // [HttpPost]
+    // public async Task<IActionResult> Post(IFormFile csvFile)
+    // {
+    //     if (csvFile != null && csvFile.Length > 0)
+    //         return Ok("Hello World");
+
+    //     return Ok("not World");
+    // }
 }

@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Hotel> Hotels { get; set; }
     public DbSet<OldFlight> OldFlights { get; set; }
     public DbSet<Flight> Flights { get; set; }
+    public DbSet<Airbnb> Airbnbs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -21,6 +22,7 @@ public class AppDbContext : DbContext
                 "Host=db;Port=5432;Database=abmbv2;Username=postgres;Password=nhlstenden2025"
             );
     }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
