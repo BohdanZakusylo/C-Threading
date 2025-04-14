@@ -1,0 +1,60 @@
+using System.Threading.Tasks;
+using ABMB.Hotels;
+using ABMB.Properties;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+
+namespace ABMB.Controllers;
+
+[ApiController]
+[Route("/get/")]
+public class HotelsController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public HotelsController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    [HttpGet("hotels")]
+    public async Task<IActionResult> Get(
+        string destination,
+        string arrivalDate,
+        string departureDate
+    )
+    {
+        HotelDataOperator hotelDataOperator = new(
+            destination,
+            _context,
+            arrivalDate,
+            departureDate
+        );
+        try
+        {
+            List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
+            var result = hotels.Select(h => new HotelReturnModel
+            {
+                price = h.ApiHotelModel.Price,
+                currency = h.ApiHotelModel.currency,
+                url = h.ApiHotelModel.Url,
+                availableRooms = h.ApiHotelModel.available_rooms,
+                countryName = h.dbHotel.countyName,
+                hotelName = h.dbHotel.HotelName,
+                phoneNumber = h.dbHotel.PhoneNumber,
+            });
+
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            if (e is CustomHotelException)
+            {
+                return BadRequest(e.Message);
+            }
+
+            Console.WriteLine(e.Message);
+            return BadRequest("Something went wrong");
+        }
+    }
+}
