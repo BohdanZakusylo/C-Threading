@@ -39,16 +39,25 @@ public class AirbnbController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> GetAirbnbs([FromQuery] string country, [FromQuery] string city)
+    public async Task<IActionResult> GetAirbnbs([FromQuery] string country, [FromQuery] string city, [FromQuery] string date)
     {
         try
         {
-            if (string.IsNullOrEmpty(country) || string.IsNullOrEmpty(city))
-                return BadRequest("Country and city parameters are required");
+            if (string.IsNullOrEmpty(country)){
+                return BadRequest("Country parameter is required");
+            }
+               
 
-            var date = DateTime.Now.ToString("yyyy-MM-dd");
-            var month = DateTime.Now.ToString("MM");
-            var year = DateTime.Now.ToString("yyyy");
+            if(string.IsNullOrEmpty(city)){
+                return BadRequest("City parameter is required");
+            }
+
+            if(string.IsNullOrEmpty(date)){
+                return BadRequest("Date parameter is required");
+            }
+
+            var month = date.Substring(5, 2);
+            var year  = date.Substring(0, 4);
 
             var matchingIds = await SearchListings(country, city);
 
