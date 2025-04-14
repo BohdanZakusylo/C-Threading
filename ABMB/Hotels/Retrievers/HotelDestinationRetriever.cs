@@ -49,8 +49,7 @@ namespace ABMB.Hotels
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"HTTP Request failed: {ex.Message}");
-                return null;
+                throw new CustomHotelException("City was not found");
             }
         }
     }

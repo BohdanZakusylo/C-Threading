@@ -1,14 +1,12 @@
-namespace ABMB.Hotels;
+using System;
 
-public class ApiHotelModel
+namespace ABMB.Hotels
 {
-    private double AvgRoomSize;
-
-    private int Price
+    public class ApiHotelModel
     {
-        get => Price;
-        set => Price = value;
+        public string? Price { get; set; }
+        public string? currency { get; set; }
+        public string? Url { get; set; }
+        public int? available_rooms { get; set; }
     }
-
-    private string Url { get; set; }
 }

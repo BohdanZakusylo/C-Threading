@@ -10,7 +10,7 @@ public class Program
     public static void Main(string[] args)
     {
         var host = CreateHostBuilder(args).Build();
-
+        DotNetEnv.Env.Load();
         // Apply migrations at startup
         using (var scope = host.Services.CreateScope())
         {
@@ -22,20 +22,38 @@ public class Program
         host.Run();
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        return Host.CreateDefaultBuilder(args)
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(
+                (hostingContext, config) =>
+                {
+                    DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
+
+                    // Get all .env variables and inject into IConfiguration
+                    var envVars = Environment.GetEnvironmentVariables();
+                    Console.WriteLine(envVars + "vars");
+                    var dict = new Dictionary<string, string?>();
+                    foreach (var key in envVars.Keys)
+                    {
+                        var strKey = key?.ToString();
+                        var value = envVars[key]?.ToString();
+                        if (strKey != null && value != null)
+                            dict[strKey] = value;
+                    }
+
+                    config.AddInMemoryCollection(dict);
+                }
+            )
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseKestrel(options =>
                 {
-                    options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
+                    options.Limits.MaxRequestBodySize = 1000 * 1024 * 1024; // 50 MB
                     options.ListenAnyIP(8080);
                 });
 
                 webBuilder.UseStartup<Startup>();
             });
-    }
 }
 
 // You'll also need to create a Startup class
@@ -53,22 +71,20 @@ public class Startup
         // Configure services
         services.Configure<FormOptions>(options =>
         {
-            options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
+            options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
         });
 
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+            options.AddPolicy(
+                "AllowAll",
+                builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+            );
         });
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-
         services.AddDbContextFactory<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+        );
         services.AddControllers();
         services.AddHttpClient();
         services.AddTransient<CsvService>();
@@ -84,6 +100,9 @@ public class Startup
         app.UseStaticFiles();
         app.UseCors("AllowAll");
         app.UseAuthorization();
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

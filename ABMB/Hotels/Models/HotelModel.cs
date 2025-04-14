@@ -1,11 +1,12 @@
-namespace ABMB.Hotels;
+using System;
+using ABMB.Models;
 
-public class HotelModel
+namespace ABMB.Hotels
 {
-    public string? CountryName { get; set; }
-    public string? CityName { get; set; }
-    public string? HotelName { get; set; }
-    public string? HotelAddress { get; set; }
-    public string? Description { get; set; }
-    public ApiHotelModel? ApiHotelModel { get; set; }
+    public class HotelModel
+    {
+        public Hotel dbHotel { get; set; }
+        public int? id { get; set; }
+        public ApiHotelModel? ApiHotelModel { get; set; }
+    }
 }

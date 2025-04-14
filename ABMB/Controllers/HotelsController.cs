@@ -1,57 +1,60 @@
 using System.Threading.Tasks;
 using ABMB.Hotels;
+using ABMB.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 
 namespace ABMB.Controllers;
 
 [ApiController]
-[Route("/get/hotels")]
+[Route("/get/")]
 public class HotelsController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing",
-        "Bracing",
-        "Chilly",
-        "Cool",
-        "Mild",
-        "Warm",
-        "Balmy",
-        "Hot",
-        "Sweltering",
-        "Scorching",
-    };
+    private readonly AppDbContext _context;
 
-    private readonly ILogger<HotelsController> _logger;
-
-    public HotelsController(ILogger<HotelsController> logger)
+    public HotelsController(AppDbContext context)
     {
-        _logger = logger;
+        _context = context;
     }
 
-    [HttpGet(Name = "GetHotels")]
-    public async Task<IEnumerable<WeatherForecast>> Get()
+    [HttpGet("hotels")]
+    public async Task<IActionResult> Get(
+        string destination,
+        string arrivalDate,
+        string departureDate
+    )
     {
-        HotelDestinationRetriever hdr = new();
-        HotelRetriever htr = new();
-
-        string hotelid = await hdr.RetreiveDestination("Kyiv");
-
-        if (hotelid == null)
+        // HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
+        HotelDataOperator hotelDataOperator = new(
+            destination,
+            _context,
+            arrivalDate,
+            departureDate
+        );
+        try
         {
-            var hotelIds = await htr.RetrieveHotelIds(hotelid);
-            Console.WriteLine(hotelIds);
-        }
-
-        return Enumerable
-            .Range(1, 5)
-            .Select(index => new WeatherForecast
+            List<HotelModel> hotels = await hotelDataOperator.GetValidHotelIds();
+            var result = hotels.Select(h => new HotelReturnModel
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-            })
-            .ToArray();
+                price = h.ApiHotelModel.Price,
+                currency = h.ApiHotelModel.currency,
+                url = h.ApiHotelModel.Url,
+                availableRooms = h.ApiHotelModel.available_rooms,
+                countryName = h.dbHotel.countyName,
+                hotelName = h.dbHotel.HotelName,
+                phoneNumber = h.dbHotel.PhoneNumber,
+            });
+
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            if (e is CustomHotelException)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return BadRequest("Something went wrong");
+        }
     }
 }
