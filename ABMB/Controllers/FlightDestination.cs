@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 namespace ABMB.Controllers;
 
 [ApiController]
-[Route("api/flights")]
+[Route("get/flights")]
 public class FlightDestination : ControllerBase
 {
     [HttpGet("price-graph")]
