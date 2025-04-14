@@ -25,6 +25,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - mynetwork
+    healthcheck:
+        test: [ "CMD", "pg_isready", "-U", "postgres" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
 
 volumes:
   postgres_data:

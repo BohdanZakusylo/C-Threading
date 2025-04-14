@@ -80,11 +80,7 @@ public class Startup
                 builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             );
         });
-
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
-        );
-
+        
         services.AddDbContextFactory<AppDbContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
         );

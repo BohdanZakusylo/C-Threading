@@ -25,9 +25,7 @@ RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
 COPY Data ./Data
-#adding the .env file path
 COPY .env ./
-
 COPY --from=publish /app/publish .
 COPY ["ABMB.csproj", "./"] 
 ENTRYPOINT ["dotnet", "ABMB.dll"]

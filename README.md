@@ -28,5 +28,11 @@ We follow strict conventions for our API endpoints.
 ## Issues
 If you ran into any issues please don't hesitate to contact us.
 
+
+## Aditional Information
+If you need to migrate something in the database run the following command
+docker exec -it abmb-webapi-1 dotnet ef database update
+
+
 ## Authors
 Bernardo Alves, Mehdi Sadeghi, Bogdan , Ayomide
