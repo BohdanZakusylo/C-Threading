@@ -5,7 +5,7 @@ namespace ABMB.Hotels
     public class HotelDataRetriever
     {
         private readonly HttpClient client = new HttpClient();
-        private readonly string apikey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
+        private readonly string apikey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
 
         public async Task OperateHotelModel(List<HotelModel> lstHotelModel)
         {

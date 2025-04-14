@@ -7,7 +7,7 @@ namespace ABMB.Hotels
     public class HotelRetriever
     {
         private readonly HttpClient client = new HttpClient();
-        private readonly string apiKey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
+        private readonly string apiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
 
         public int Levenshtein(string a, string b)
         {

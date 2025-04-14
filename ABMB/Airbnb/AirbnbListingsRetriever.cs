@@ -13,7 +13,7 @@ public class AirbnbListingsRetriever
     private readonly ILogger<AirbnbListingsRetriever> _logger;
     private readonly HttpClient _httpClient;
     private readonly AirbnbUtils _airbnbUtils;
-    private const string RapidApiKey = "d4d0ef677fmsha3418e97ed26df9p12df8bjsn6c2d64ebd551";
+    private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
     public AirbnbListingsRetriever(

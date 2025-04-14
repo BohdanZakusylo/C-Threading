@@ -24,7 +24,6 @@ public class HotelsController : ControllerBase
         string departureDate
     )
     {
-        // HotelDataOperator hotelDataOperator = new("Merlo", _context, "2025-11-12", "2025-11-15");
         HotelDataOperator hotelDataOperator = new(
             destination,
             _context,
