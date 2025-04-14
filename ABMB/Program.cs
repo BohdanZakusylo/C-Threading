@@ -1,5 +1,6 @@
 using ABMB.Properties;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ABMB;
@@ -72,6 +73,9 @@ public class Startup
         services.AddHttpClient();
         services.AddTransient<CsvService>();
         services.AddScoped<AirbnbService>();
+        services.AddScoped<AirbnbListingsRetriever>();
+        services.AddScoped<AirBnBPriceRetriever>();
+        services.AddScoped<Controllers.AirbnbModule.AirbnbUtils>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

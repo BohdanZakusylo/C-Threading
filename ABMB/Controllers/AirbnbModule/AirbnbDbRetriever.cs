@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using ABMB.Models;
 using ABMB.Properties;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace ABMB.Controllers.AirbnbModule;
 

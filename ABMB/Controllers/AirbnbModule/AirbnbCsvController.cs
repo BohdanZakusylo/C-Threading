@@ -17,21 +17,18 @@ public class AirbnbCsvController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(IFormFile csvFile)
     {
-        // Check if file is provided
         if (csvFile == null)
         {
             Console.WriteLine("Error: No file was uploaded.");
             return BadRequest(new { message = "No file was uploaded." });
         }
 
-        // Check file size (50MB limit)- delete this
         if (csvFile.Length > 50 * 1024 * 1024)
         {
             Console.WriteLine($"Error: File size {csvFile.Length} bytes exceeds the 50MB limit.");
             return BadRequest(new { message = "File size exceeds the 50MB limit." });
         }
 
-        // Check file extension
         var extension = Path.GetExtension(csvFile.FileName).ToLowerInvariant();
         if (extension != ".csv")
         {
