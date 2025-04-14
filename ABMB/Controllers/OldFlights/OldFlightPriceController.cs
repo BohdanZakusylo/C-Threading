@@ -10,14 +10,14 @@ namespace ABMB.Controllers;
 public class OldFlightPriceController : ControllerBase
 {
     private readonly AppDbContext _appContext;
-    
+
     public OldFlightPriceController(AppDbContext appContext)
     {
         _appContext = appContext;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPrice([FromBody] FlightRequest flightRequest)
+    public async Task<IActionResult> GetPrice([FromQuery] FlightRequest flightRequest)
     {
         if (flightRequest == null)
         {
@@ -27,7 +27,6 @@ public class OldFlightPriceController : ControllerBase
         var departureId = flightRequest.DepartureId;
         var arrivalId = flightRequest.ArrivalId;
 
-    
         if (string.IsNullOrEmpty(departureId) || string.IsNullOrEmpty(arrivalId))
         {
             return BadRequest(new { message = "DepartureId and ArrivalId are required." });
@@ -37,7 +36,7 @@ public class OldFlightPriceController : ControllerBase
             .AsNoTracking()
             .Where(f => f.Origin == departureId && f.Destination == arrivalId)
             .ToListAsync();
-        
+
         if (!flights.Any())
         {
             return NotFound(new { message = "No flights found for the given criteria." });
@@ -46,8 +45,6 @@ public class OldFlightPriceController : ControllerBase
         return Ok(flights);
     }
 
-
-
     public class FlightRequest
     {
         [Required]
@@ -55,5 +52,4 @@ public class OldFlightPriceController : ControllerBase
         [Required]
         public string ArrivalId { get; set; }
     }
-
 }
