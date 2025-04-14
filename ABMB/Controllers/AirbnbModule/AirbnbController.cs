@@ -1,8 +1,3 @@
-using System.Dynamic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using ABMB.Controllers.AirbnbModule;
-using ABMB.Models;
 using ABMB.Properties;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,33 +9,22 @@ namespace ABMB.Controllers.AirbnbModule;
 public class AirbnbController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly ILogger<AirbnbController> _logger;
     private readonly HttpClient _httpClient;
-    private readonly AirbnbDbRetriever _airbnbDbRetriever;
     private readonly AirBnBPriceRetriever _airBnBPriceRetriever;
     private readonly AirbnbListingsRetriever _airbnbListingsRetriever;
-
-    private readonly AirbnbUtils _airbnbUtils;
     private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
     public AirbnbController(
-        AppDbContext context,
-        ILogger<AirbnbController> logger,
-        IHttpClientFactory httpClientFactory,
-        AirBnBPriceRetriever airBnBPriceRetriever,
-        AirbnbListingsRetriever airbnbListingsRetriever
+        AppDbContext context
     )
     {
         _context = context;
-        _logger = logger;
-        _httpClient = httpClientFactory.CreateClient();
+        _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", RapidApiKey);
         _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Host", RapidApiHost);
-        _airbnbDbRetriever = new AirbnbDbRetriever(context);
-        _airbnbUtils = new AirbnbUtils();
-        _airBnBPriceRetriever = airBnBPriceRetriever;
-        _airbnbListingsRetriever = airbnbListingsRetriever;
+        _airBnBPriceRetriever = new AirBnBPriceRetriever();
+        _airbnbListingsRetriever = new AirbnbListingsRetriever(context);
     }
 
     [HttpGet("airbnb")]
@@ -75,10 +59,6 @@ public class AirbnbController : ControllerBase
             if (!matchingIds.Any())
                 return NotFound("No listings found matching the criteria");
 
-            _logger.LogInformation(
-                $"Found {matchingIds.Count} listings in {country} with keyword: {city}"
-            );
-
             List<String> matchingIdsAsString = new List<String>();
 
             foreach (var id in matchingIds)
@@ -104,21 +84,18 @@ public class AirbnbController : ControllerBase
             foreach (var id in availableListings)
             {
                 var data = await _airbnbListingsRetriever.RetrieveDataForListings(long.Parse(id));
-                _logger.LogInformation($"Data for listing {id}: {data}");
 
                 var currentPrice = await _airBnBPriceRetriever.GetListingPrice(
                     id,
                     int.Parse(year),
                     month
                 );
-                _logger.LogInformation($"Current price for listing {id}: {currentPrice}");
 
                 var priceComparison = await _airBnBPriceRetriever.GetPriceComparison(
                     id,
                     int.Parse(year),
                     month
                 );
-                _logger.LogInformation($"Price comparison for listing {id}: {priceComparison}");
 
                 if (currentPrice != 0)
                 {
@@ -130,8 +107,6 @@ public class AirbnbController : ControllerBase
                         listingData["priceComparison"] = priceComparison;
                         result.Add(listingData);
                     }
-
-                    _logger.LogInformation($"Listing data: {listingData}");
                 }
             }
 
@@ -139,7 +114,6 @@ public class AirbnbController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in GetAirbnbs");
             return StatusCode(500, "An internal server error occurred.");
         }
     }
@@ -148,16 +122,10 @@ public class AirbnbController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"Searching for listings in {country} with keyword: {city}");
-
             var resultList = new List<long>();
             var foundListings = await _context
                 .Airbnbs.Where(a => a.Country.ToLower().Trim() == country.ToLower().Trim())
                 .ToListAsync();
-
-            _logger.LogInformation($"Found {foundListings.Count} listings in {country}");
-
-            _logger.LogInformation($"Found {foundListings.ToString} listings in {country}");
 
             if (foundListings.Count == 0)
             {
@@ -171,8 +139,6 @@ public class AirbnbController : ControllerBase
                 .Select(a => a.AirbnbId)
                 .ToList();
 
-            _logger.LogInformation($"Found {matchingIds.Count} matching listings");
-
             if (matchingIds.Count == 0)
             {
                 return resultList;
@@ -184,7 +150,6 @@ public class AirbnbController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching listings");
             throw new Exception("No listings found matching the criteria");
         }
     }

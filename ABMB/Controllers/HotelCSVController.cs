@@ -31,7 +31,7 @@ public class HotelCSVController : ControllerBase
             HotelCSVUploader hotelUploader = new(_contextFactory);
             hotelUploader.InsertCSVUsingThreadPool(stream);
 
-            return Ok(new { Message = "hotels inserted from local file." });
+            return Ok(new { Message = "Hotels inserted from local file." });
         }
         catch
         {

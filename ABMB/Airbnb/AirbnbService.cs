@@ -10,17 +10,14 @@ using Npgsql;
 public class AirbnbService
 {
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
-    private readonly ILogger<AirbnbService> _logger;
 
     private static readonly object _saveLock = new();
 
     public AirbnbService(
-        IDbContextFactory<AppDbContext> contextFactory,
-        ILogger<AirbnbService> logger
+        IDbContextFactory<AppDbContext> contextFactory
     )
     {
         _contextFactory = contextFactory;
-        _logger = logger;
     }
 
     public async Task<IEnumerable<Airbnb>> ReadCsvFileAirbnb(Stream fileStream)
@@ -34,40 +31,30 @@ public class AirbnbService
             {
                 csv.Context.RegisterClassMap<AirbnbMap>();
 
-                _logger.LogInformation("Reading CSV records into memory");
-
                 var allRecords = new List<Airbnb>();
                 await foreach (var record in csv.GetRecordsAsync<Airbnb>())
                 {
                     allRecords.Add(record);
                 }
 
-                _logger.LogInformation($"Read {allRecords.Count} records from CSV");
-
                 lock (_saveLock)
                 {
-                    _logger.LogInformation("Acquired lock for saving records");
-
                     SaveAllRecordsAsync(allRecords).GetAwaiter().GetResult();
                 }
 
-                _logger.LogInformation("All records have been saved to the database");
                 return allRecords;
             }
         }
         catch (HeaderValidationException e)
         {
-            _logger.LogError(e, "CSV file header is invalid");
             throw new ApplicationException("CSV file header is invalid.", e);
         }
         catch (TypeConverterException ex)
         {
-            _logger.LogError(ex, "CSV file contains invalid data format");
             throw new ApplicationException("CSV file contains invalid data format.", ex);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error reading CSV file");
             throw new ApplicationException("Error reading CSV file", e);
         }
     }
@@ -102,20 +89,14 @@ public class AirbnbService
                     }
 
                     await transaction.CommitAsync();
-                    _logger.LogInformation($"Saved {newRecords.Count} records to database");
                 }
                 catch (DbUpdateException ex)
                     when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
                 {
-                    _logger.LogError(
-                        ex,
-                        "Duplicate key value violates unique constraint 'PK_Airbnbs'"
-                    );
                     await transaction.RollbackAsync();
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error saving records to database");
                     await transaction.RollbackAsync();
                     throw new ApplicationException("Error saving records to database", ex);
                 }

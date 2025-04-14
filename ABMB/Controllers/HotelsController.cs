@@ -53,6 +53,7 @@ public class HotelsController : ControllerBase
                 return BadRequest(e.Message);
             }
 
+            Console.WriteLine(e.Message);
             return BadRequest("Something went wrong");
         }
     }

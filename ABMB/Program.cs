@@ -77,6 +77,19 @@ public class Startup
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
         );
 
+        services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", builder =>
+                {
+                    builder
+                        .WithOrigins("http://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+
+        services.AddHttpClient();
         services.AddControllers();
         services.AddTransient<CsvService>();
         services.AddTransient<AirbnbService>();
@@ -84,6 +97,7 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        app.UseCors("AllowFrontend");
         app.UseRouting();
         app.UseStaticFiles();
         app.UseAuthorization();

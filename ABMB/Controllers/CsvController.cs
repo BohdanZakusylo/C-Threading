@@ -23,7 +23,7 @@ public class CsvController : ControllerBase
             try
             {
                 var records = (await _csvService.ReadCsvFile(stream)).ToList();
-                return Ok(new { message = "Fields added successfully", data = records });
+                return Ok(new { message = "Flights fields added successfully from the file" });
             }
             catch (ApplicationException e)
             {
@@ -35,7 +35,7 @@ public class CsvController : ControllerBase
                 Console.WriteLine(e);
                 return StatusCode(
                     500,
-                    new { message = "Internal error occurred.", details = e.Message }
+                    new { message = "Database error occured, please try again" }
                 );
             }
         }

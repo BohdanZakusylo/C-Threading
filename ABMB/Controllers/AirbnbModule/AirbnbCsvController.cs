@@ -24,16 +24,12 @@ public class AirbnbCsvController : ControllerBase
 
         if (csvFile.Length > 50 * 1024 * 1024)
         {
-            Console.WriteLine($"Error: File size {csvFile.Length} bytes exceeds the 50MB limit.");
             return BadRequest(new { message = "File size exceeds the 50MB limit." });
         }
 
         var extension = Path.GetExtension(csvFile.FileName).ToLowerInvariant();
         if (extension != ".csv")
         {
-            Console.WriteLine(
-                $"Error: Invalid file extension {extension}. Only CSV files are allowed."
-            );
             return BadRequest(new { message = "Only CSV files are allowed." });
         }
 
@@ -44,19 +40,14 @@ public class AirbnbCsvController : ControllerBase
 
             if (!records.Any())
             {
-                Console.WriteLine("Warning: File processed but contains no records.");
                 return NoContent();
             }
 
-            Console.WriteLine(
-                $"Success: Processed {records.Count} records from file {csvFile.FileName}"
-            );
             return Ok(
                 new
                 {
                     message = "File processed successfully",
-                    recordsProcessed = records.Count,
-                    data = records,
+                    recordsProcessed = records.Count
                 }
             );
         }
