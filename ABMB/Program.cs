@@ -20,10 +20,28 @@ public class Program
 
         host.Run();
     }
+    
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(
+                (hostingContext, config) =>
+                {
+                    DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        return Host.CreateDefaultBuilder(args)
+                    // Get all .env variables and inject into IConfiguration
+                    var envVars = Environment.GetEnvironmentVariables();
+                    var dict = new Dictionary<string, string?>();
+                    foreach (var key in envVars.Keys)
+                    {
+                        var strKey = key?.ToString();
+                        var value = envVars[key]?.ToString();
+                        if (strKey != null && value != null)
+                            dict[strKey] = value;
+                    }
+
+                    config.AddInMemoryCollection(dict);
+                }
+            )
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseKestrel(options =>
@@ -34,7 +52,6 @@ public class Program
 
                 webBuilder.UseStartup<Startup>();
             });
-    }
 }
 
 // You'll also need to create a Startup class
@@ -52,7 +69,7 @@ public class Startup
         // Configure services
         services.Configure<FormOptions>(options =>
         {
-            options.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
+            options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
         });
 
         services.AddCors(options =>

@@ -1,9 +1,9 @@
+using System.Globalization;
+using System.Threading;
 using ABMB.Models;
 using ABMB.Properties;
 using CsvHelper;
-using System.Globalization;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace ABMB.Hotels
 {
@@ -16,17 +16,9 @@ namespace ABMB.Hotels
             _contextFactory = contextFactory;
         }
 
-        public void InsertCSVUsingThreadPool()
+        public void InsertCSVUsingThreadPool(Stream csvStream)
         {
-            var filePath = "./Data/new_hotels.csv";
-
-            if (!File.Exists(filePath))
-            {
-                Console.WriteLine("CSV file not found.");
-                return;
-            }
-
-            using var reader = new StreamReader(filePath);
+            using var reader = new StreamReader(csvStream);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             csv.Context.RegisterClassMap<HotelMap>();
 

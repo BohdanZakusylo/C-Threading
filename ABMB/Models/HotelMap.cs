@@ -1,5 +1,5 @@
-using CsvHelper.Configuration;
 using ABMB.Models;
+using CsvHelper.Configuration;
 
 public sealed class HotelMap : ClassMap<Hotel>
 {
