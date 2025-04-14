@@ -8,6 +8,7 @@ namespace ABMB.Controllers;
 [Route("get/flights")]
 public class FlightDestination : ControllerBase
 {
+    private readonly string apiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     [HttpGet("price-graph")]
     public async Task<IActionResult> GetPriceGraph(
         [FromQuery] string departure_id,
@@ -39,7 +40,7 @@ public class FlightDestination : ControllerBase
 
         using var client = new HttpClient();
         var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        request.Headers.Add("x-rapidapi-key", "bbd470342dmsh7745d93e16a8151p12063fjsn458923265781");
+        request.Headers.Add("x-rapidapi-key", apiKey);
         request.Headers.Add("x-rapidapi-host", "google-flights2.p.rapidapi.com");
 
         try
