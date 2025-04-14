@@ -78,16 +78,15 @@ public class Startup
         );
 
         services.AddCors(options =>
-            {
-                options.AddPolicy("AllowFrontend", builder =>
+        {
+            options.AddPolicy(
+                "AllowFrontend",
+                builder =>
                 {
-                    builder
-                        .WithOrigins("http://localhost:5173")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
-            });
-
+                    builder.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod();
+                }
+            );
+        });
 
         services.AddHttpClient();
         services.AddControllers();

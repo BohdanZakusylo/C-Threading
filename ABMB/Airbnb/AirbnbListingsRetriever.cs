@@ -14,9 +14,7 @@ public class AirbnbListingsRetriever
     private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
-    public AirbnbListingsRetriever(
-        AppDbContext context
-    )
+    public AirbnbListingsRetriever(AppDbContext context)
     {
         _context = context;
         _httpClient = new HttpClient();

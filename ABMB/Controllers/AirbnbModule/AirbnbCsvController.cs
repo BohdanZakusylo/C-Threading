@@ -44,11 +44,7 @@ public class AirbnbCsvController : ControllerBase
             }
 
             return Ok(
-                new
-                {
-                    message = "File processed successfully",
-                    recordsProcessed = records.Count
-                }
+                new { message = "File processed successfully", recordsProcessed = records.Count }
             );
         }
         catch (ApplicationException e)

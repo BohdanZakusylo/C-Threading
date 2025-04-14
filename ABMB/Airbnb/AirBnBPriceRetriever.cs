@@ -14,8 +14,7 @@ public class AirBnBPriceRetriever
     private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
-    public AirBnBPriceRetriever(
-    )
+    public AirBnBPriceRetriever()
     {
         _httpClient = new HttpClient();
         _airbnbUtils = new AirbnbUtils();
@@ -72,7 +71,6 @@ public class AirBnBPriceRetriever
             {
                 if (!response.IsSuccessStatusCode)
                 {
-
                     throw new Exception($"Failed to get listing price, {response.StatusCode}");
                 }
 

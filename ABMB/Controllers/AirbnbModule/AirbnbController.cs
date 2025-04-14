@@ -15,9 +15,7 @@ public class AirbnbController : ControllerBase
     private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
-    public AirbnbController(
-        AppDbContext context
-    )
+    public AirbnbController(AppDbContext context)
     {
         _context = context;
         _httpClient = new HttpClient();

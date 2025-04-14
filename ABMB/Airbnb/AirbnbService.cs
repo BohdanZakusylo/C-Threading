@@ -13,9 +13,7 @@ public class AirbnbService
 
     private static readonly object _saveLock = new();
 
-    public AirbnbService(
-        IDbContextFactory<AppDbContext> contextFactory
-    )
+    public AirbnbService(IDbContextFactory<AppDbContext> contextFactory)
     {
         _contextFactory = contextFactory;
     }
