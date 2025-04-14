@@ -107,7 +107,7 @@ public class AirbnbController : ControllerBase
                     }
                 }
             }
-
+            Console.WriteLine(result);
             return Ok(result);
         }
         catch (Exception ex)

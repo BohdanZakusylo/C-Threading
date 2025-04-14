@@ -103,6 +103,7 @@ public class AirbnbListingsRetriever
 
             if (!response.IsSuccessStatusCode)
             {
+                Console.WriteLine("api key error");
                 return false;
             }
 
@@ -122,6 +123,8 @@ public class AirbnbListingsRetriever
         }
         catch (Exception ex)
         {
+
+            Console.WriteLine(ex);
             return false;
         }
     }
