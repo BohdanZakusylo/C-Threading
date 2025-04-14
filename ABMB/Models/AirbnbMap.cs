@@ -1,6 +1,6 @@
-﻿using CsvHelper.Configuration;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-using CsvHelper;
 
 namespace ABMB.Models;
 
@@ -12,7 +12,7 @@ public class AirbnbMap : ClassMap<Airbnb>
     {
         // Map CSV headers to class properties
         Map(m => m.Id).Ignore();
-        
+
         Map(m => m.AirbnbId).Name("airbnb_id");
         Map(m => m.Name).Name("name");
         Map(m => m.Rating).Name("rating");

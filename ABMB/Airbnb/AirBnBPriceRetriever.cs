@@ -1,54 +1,71 @@
-using Microsoft.AspNetCore.Mvc;
-using ABMB.Models;
 using System.Dynamic;
-using ABMB.Properties;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ABMB.Controllers.AirbnbModule;    
+using ABMB.Controllers.AirbnbModule;
+using ABMB.Models;
+using ABMB.Properties;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-
-public class AirBnBPriceRetriever{
-
+public class AirBnBPriceRetriever
+{
     private readonly ILogger<AirBnBPriceRetriever> _logger;
     private readonly HttpClient _httpClient;
     private readonly AirbnbUtils _airbnbUtils;
     private const string RapidApiKey = "d4d0ef677fmsha3418e97ed26df9p12df8bjsn6c2d64ebd551";
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
-    public AirBnBPriceRetriever(ILogger<AirBnBPriceRetriever> logger, IHttpClientFactory httpClientFactory, AirbnbUtils airbnbUtils){
+    public AirBnBPriceRetriever(
+        ILogger<AirBnBPriceRetriever> logger,
+        IHttpClientFactory httpClientFactory,
+        AirbnbUtils airbnbUtils
+    )
+    {
         _logger = logger;
         _httpClient = httpClientFactory.CreateClient();
         _airbnbUtils = airbnbUtils;
     }
 
- public async Task<decimal> GetPriceComparison(
-        string airbnbId,
-        int year,
-        string month)
+    public async Task<decimal> GetPriceComparison(string airbnbId, int year, string month)
     {
         try
         {
             var currentPrice = await GetListingPrice(airbnbId, year, month);
             if (currentPrice == 0)
             {
-                _logger.LogWarning($"Current price is 0 for listing comparison. airbnbId: {airbnbId}");
+                _logger.LogWarning(
+                    $"Current price is 0 for listing comparison. airbnbId: {airbnbId}"
+                );
             }
 
-            var (previousYear, previousMonth) = _airbnbUtils.GetPreviousMonth(year, int.Parse(month));
+            var (previousYear, previousMonth) = _airbnbUtils.GetPreviousMonth(
+                year,
+                int.Parse(month)
+            );
 
-            var previousPrice = await GetListingPrice(airbnbId, previousYear, previousMonth.ToString("D2"));
+            var previousPrice = await GetListingPrice(
+                airbnbId,
+                previousYear,
+                previousMonth.ToString("D2")
+            );
             if (previousPrice == 0)
             {
-                _logger.LogWarning($"Previous price is 0 for listing comparison. currentPrice: {currentPrice}");
+                _logger.LogWarning(
+                    $"Previous price is 0 for listing comparison. currentPrice: {currentPrice}"
+                );
             }
 
-            _logger.LogWarning($"Previous price is 0 for listing comparison. currentPrice: {currentPrice}");
+            _logger.LogWarning(
+                $"Previous price is 0 for listing comparison. currentPrice: {currentPrice}"
+            );
 
-            decimal percentageDifference = _airbnbUtils.CalculatePercentageDifference(currentPrice, previousPrice);
+            decimal percentageDifference = _airbnbUtils.CalculatePercentageDifference(
+                currentPrice,
+                previousPrice
+            );
             _logger.LogInformation($"Percentage difference: {percentageDifference}");
 
-            return percentageDifference;    
+            return percentageDifference;
         }
         catch (Exception ex)
         {
@@ -57,29 +74,32 @@ public class AirBnBPriceRetriever{
         }
     }
 
-    
-    
     public async Task<decimal> GetListingPrice(string airbnbId, int year, string month)
     {
         try
         {
             _logger.LogInformation($"Getting price for listing {airbnbId} in {month} {year}");
 
-             var request = new HttpRequestMessage{
+            var request = new HttpRequestMessage
+            {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://{RapidApiHost}/v2/listingPrices?id={airbnbId}&year={year}&month={month}"),
-                Headers = {
+                RequestUri = new Uri(
+                    $"https://{RapidApiHost}/v2/listingPrices?id={airbnbId}&year={year}&month={month}"
+                ),
+                Headers =
+                {
                     { "X-RapidAPI-Key", RapidApiKey },
-                    { "X-RapidAPI-Host", RapidApiHost }
-                }
+                    { "X-RapidAPI-Host", RapidApiHost },
+                },
             };
 
             using (var response = await _httpClient.SendAsync(request))
             {
-
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"RapidAPI request failed with status code: {response.StatusCode}");
+                    _logger.LogError(
+                        $"RapidAPI request failed with status code: {response.StatusCode}"
+                    );
                     throw new Exception($"Failed to get listing price, {response.StatusCode}");
                 }
 
@@ -97,7 +117,6 @@ public class AirBnBPriceRetriever{
 
                 return averagePrice;
             }
-         
         }
         catch (Exception ex)
         {
@@ -106,5 +125,3 @@ public class AirBnBPriceRetriever{
         }
     }
 }
-    
-    
