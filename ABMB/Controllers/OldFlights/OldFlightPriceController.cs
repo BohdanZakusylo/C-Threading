@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ABMB.Controllers;
 [ApiController]
-[Route("get/oldflightprice/price")]
+[Route("get/oldflightprice")]
 public class OldFlightPriceController : ControllerBase
 {
     private readonly AppDbContext _appContext;
