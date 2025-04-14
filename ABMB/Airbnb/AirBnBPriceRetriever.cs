@@ -9,21 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 public class AirBnBPriceRetriever
 {
-    private readonly ILogger<AirBnBPriceRetriever> _logger;
     private readonly HttpClient _httpClient;
     private readonly AirbnbUtils _airbnbUtils;
     private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
     public AirBnBPriceRetriever(
-        ILogger<AirBnBPriceRetriever> logger,
-        IHttpClientFactory httpClientFactory,
-        AirbnbUtils airbnbUtils
     )
     {
-        _logger = logger;
-        _httpClient = httpClientFactory.CreateClient();
-        _airbnbUtils = airbnbUtils;
+        _httpClient = new HttpClient();
+        _airbnbUtils = new AirbnbUtils();
     }
 
     public async Task<decimal> GetPriceComparison(string airbnbId, int year, string month)
@@ -31,12 +26,6 @@ public class AirBnBPriceRetriever
         try
         {
             var currentPrice = await GetListingPrice(airbnbId, year, month);
-            if (currentPrice == 0)
-            {
-                _logger.LogWarning(
-                    $"Current price is 0 for listing comparison. airbnbId: {airbnbId}"
-                );
-            }
 
             var (previousYear, previousMonth) = _airbnbUtils.GetPreviousMonth(
                 year,
@@ -48,28 +37,16 @@ public class AirBnBPriceRetriever
                 previousYear,
                 previousMonth.ToString("D2")
             );
-            if (previousPrice == 0)
-            {
-                _logger.LogWarning(
-                    $"Previous price is 0 for listing comparison. currentPrice: {currentPrice}"
-                );
-            }
-
-            _logger.LogWarning(
-                $"Previous price is 0 for listing comparison. currentPrice: {currentPrice}"
-            );
 
             decimal percentageDifference = _airbnbUtils.CalculatePercentageDifference(
                 currentPrice,
                 previousPrice
             );
-            _logger.LogInformation($"Percentage difference: {percentageDifference}");
 
             return percentageDifference;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error comparing prices for listing {airbnbId}");
             throw new Exception($"An error occurred while comparing prices, {ex.Message}");
         }
     }
@@ -78,8 +55,6 @@ public class AirBnBPriceRetriever
     {
         try
         {
-            _logger.LogInformation($"Getting price for listing {airbnbId} in {month} {year}");
-
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
@@ -97,14 +72,11 @@ public class AirBnBPriceRetriever
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError(
-                        $"RapidAPI request failed with status code: {response.StatusCode}"
-                    );
+
                     throw new Exception($"Failed to get listing price, {response.StatusCode}");
                 }
 
                 var content = await response.Content.ReadAsStringAsync();
-                _logger.LogInformation("Raw response: {Response}", content);
                 var priceData = JsonSerializer.Deserialize<PriceResponse>(content);
 
                 if (priceData?.Results == null || !priceData.Results.Any())
@@ -113,14 +85,12 @@ public class AirBnBPriceRetriever
                 }
 
                 var averagePrice = priceData.Results.Average(r => r.PriceEur);
-                _logger.LogInformation($"Average price for listing {airbnbId}: {averagePrice}");
 
                 return averagePrice;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting listing price");
             throw new Exception($"An error occurred while getting the listing price, {ex.Message}");
         }
     }

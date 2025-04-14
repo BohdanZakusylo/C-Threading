@@ -6,7 +6,7 @@ namespace ABMB.Hotels
 {
     public class HotelDestinationRetriever()
     {
-        private readonly string apiKey = "d7e04bf279mshec134d993d91779p127357jsn01575d5b549f";
+        private readonly string apiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
 
         public async Task<string?> RetreiveDestination(string Destination)
         {
@@ -40,6 +40,7 @@ namespace ABMB.Hotels
 
                         if (searchType == "city" && city_name.Equals(Destination))
                         {
+                            Console.WriteLine(item.GetProperty("dest_id").GetString());
                             return item.GetProperty("dest_id").GetString();
                         }
                     }
@@ -49,7 +50,7 @@ namespace ABMB.Hotels
             }
             catch (HttpRequestException ex)
             {
-                throw new CustomHotelException("City was not found");
+                throw new CustomHotelException("API key error");
             }
         }
     }

@@ -1,6 +1,5 @@
 using System.Dynamic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using ABMB.Controllers.AirbnbModule;
 using ABMB.Models;
 using ABMB.Properties;
@@ -10,31 +9,24 @@ using Microsoft.EntityFrameworkCore;
 public class AirbnbListingsRetriever
 {
     private readonly AppDbContext _context;
-    private readonly ILogger<AirbnbListingsRetriever> _logger;
     private readonly HttpClient _httpClient;
     private readonly AirbnbUtils _airbnbUtils;
     private readonly string RapidApiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
     private const string RapidApiHost = "airbnb-listings.p.rapidapi.com";
 
     public AirbnbListingsRetriever(
-        AppDbContext context,
-        ILogger<AirbnbListingsRetriever> logger,
-        IHttpClientFactory httpClientFactory,
-        AirbnbUtils airbnbUtils
+        AppDbContext context
     )
     {
         _context = context;
-        _logger = logger;
-        _httpClient = httpClientFactory.CreateClient();
-        _airbnbUtils = airbnbUtils;
+        _httpClient = new HttpClient();
+        _airbnbUtils = new AirbnbUtils();
     }
 
     public async Task<List<ExpandoObject>> RetrieveDataForListings(long airbnbId)
     {
         try
         {
-            _logger.LogInformation($"Searching for listings in {airbnbId}");
-
             var foundListings = await _context
                 .Airbnbs.Where(a => a.AirbnbId == airbnbId)
                 .Select(a => new
@@ -51,8 +43,6 @@ public class AirbnbListingsRetriever
                     a.CheckOut,
                 })
                 .ToListAsync();
-
-            _logger.LogInformation($"Found {foundListings.Count} listings in {airbnbId}");
 
             if (!foundListings.Any())
             {
@@ -84,7 +74,6 @@ public class AirbnbListingsRetriever
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching listings");
             throw new Exception("No listings found matching the criteria");
         }
     }
@@ -98,10 +87,6 @@ public class AirbnbListingsRetriever
     {
         try
         {
-            _logger.LogInformation(
-                $"Checking availability for listing airbnbId:{airbnbId} in month:{month} year:{year} and date:{date}"
-            );
-
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
@@ -120,25 +105,18 @@ public class AirbnbListingsRetriever
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning($"Failed API call for listing {airbnbId}, response: {content}");
                 return false;
             }
 
             var availabilityData = JsonSerializer.Deserialize<AvailabilityResponse>(content);
             if (availabilityData?.Results == null)
             {
-                _logger.LogWarning(
-                    $"No 'results' in API response for listing {airbnbId}. Raw: {content}"
-                );
                 return false;
             }
 
             var availability = availabilityData.Results.FirstOrDefault(r => r.Date == date);
             if (availability == null)
             {
-                _logger.LogWarning(
-                    $"No entry for date {date} in availability results for {airbnbId}"
-                );
                 return false;
             }
 
@@ -146,7 +124,6 @@ public class AirbnbListingsRetriever
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error checking availability for listing {airbnbId}");
             return false;
         }
     }
@@ -162,8 +139,6 @@ public class AirbnbListingsRetriever
 
         try
         {
-            _logger.LogInformation($"Checking availability for {ids.Count} listings");
-
             foreach (var id in ids)
             {
                 try
@@ -182,17 +157,13 @@ public class AirbnbListingsRetriever
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error checking availability for ID {id}");
                     continue;
                 }
             }
-
-            _logger.LogInformation($"Found {availableIds.Count} available out of {ids.Count}");
             return availableIds;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking multiple listings availability");
             throw;
         }
     }
