@@ -3,7 +3,7 @@
 namespace ABMB.Controllers.AirbnbModule;
 
 [ApiController]
-[Route("api/airbnb/upload")]
+[Route("post/airbnb")]
 public class AirbnbCsvController : ControllerBase
 {
     private readonly AirbnbService _airbnbService;

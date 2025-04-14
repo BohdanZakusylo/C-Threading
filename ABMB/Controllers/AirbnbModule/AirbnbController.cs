@@ -11,7 +11,7 @@ using ABMB.Controllers.AirbnbModule;
 namespace ABMB.Controllers.AirbnbModule;
 
 [ApiController]
-[Route("api/airbnb")]
+[Route("get")]
 public class AirbnbController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -38,7 +38,7 @@ public class AirbnbController : ControllerBase
         _airbnbListingsRetriever = airbnbListingsRetriever;
     }
 
-    [HttpGet("search")]
+    [HttpGet("airbnb")]
     public async Task<IActionResult> GetAirbnbs([FromQuery] string country, [FromQuery] string city, [FromQuery] string date)
     {
         try
