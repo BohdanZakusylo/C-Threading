@@ -10,19 +10,13 @@ namespace ABMB.Hotels
         public string departureDate;
         private HotelDbRetriever hotelDbRetriever;
 
-        public HotelDataOperator(
-            string destination,
-            AppDbContext context,
-            string arrivalDate,
-            string departureDate
-        )
+        public HotelDataOperator(string destination, AppDbContext context, string arrivalDate, string departureDate)
         {
             this.destination = destination;
             this.hotelDbRetriever = new(context);
             this.arrivalDate = arrivalDate;
             this.departureDate = departureDate;
         }
-
         public async Task<string> GetCityId()
         {
             HotelDestinationRetriever hotelDestinationRetriever = new();
@@ -43,12 +37,7 @@ namespace ABMB.Hotels
 
             string cityId = await this.GetCityId();
             List<Hotel> hotels = this.hotelDbRetriever.getHotelsDb(destination);
-            List<HotelModel> readyHotels = await hotelRetriever.RetrieveHotelIds(
-                cityId,
-                hotels,
-                this.arrivalDate,
-                this.departureDate
-            );
+            List<HotelModel> readyHotels = await hotelRetriever.RetrieveHotelIds(cityId, hotels, this.arrivalDate, this.departureDate);
 
             await hotelDataRetriever.OperateHotelModel(readyHotels);
 

@@ -14,6 +14,7 @@ public class CsvController : ControllerBase
     }
 
     [HttpPost]
+    [RequestSizeLimit(100_000_000)]
     public async Task<IActionResult> Post(IFormFile csvFile)
     {
         if (csvFile != null && csvFile.Length > 0)

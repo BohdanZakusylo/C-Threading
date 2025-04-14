@@ -1,5 +1,5 @@
-using ABMB.Models;
 using ABMB.Properties;
+using ABMB.Models;
 
 namespace ABMB.Hotels
 {
@@ -16,9 +16,9 @@ namespace ABMB.Hotels
         {
             try
             {
-                List<Hotel> hotelsFromDb = _context
-                    .Hotels.Where(h => h.cityName.Equals(destination))
-                    .ToList();
+                List<Hotel> hotelsFromDb = _context.Hotels
+                .Where(h => h.cityName.Equals(destination))
+                .ToList();
 
                 return hotelsFromDb;
             }

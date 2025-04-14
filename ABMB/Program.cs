@@ -1,6 +1,5 @@
 using ABMB.Properties;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ABMB;
@@ -9,62 +8,57 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var host = CreateHostBuilder(args).Build();
+        // Load .env first
         DotNetEnv.Env.Load();
-        // Apply migrations at startup
-        using (var scope = host.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            var context = services.GetRequiredService<AppDbContext>();
-            context.Database.Migrate();
-        }
 
-        host.Run();
+        var key = Environment.GetEnvironmentVariable("RAPID_API_KEY");
+
+        CreateHostBuilder(args).Build().Run();
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(
-                (hostingContext, config) =>
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
+
+                // Get all .env variables and inject into IConfiguration
+                var envVars = Environment.GetEnvironmentVariables();
+                var dict = new Dictionary<string, string?>();
+                foreach (var key in envVars.Keys)
                 {
-                    DotNetEnv.Env.Load(); // Load .env again here to inject into IConfiguration
-
-                    // Get all .env variables and inject into IConfiguration
-                    var envVars = Environment.GetEnvironmentVariables();
-                    Console.WriteLine(envVars + "vars");
-                    var dict = new Dictionary<string, string?>();
-                    foreach (var key in envVars.Keys)
-                    {
-                        var strKey = key?.ToString();
-                        var value = envVars[key]?.ToString();
-                        if (strKey != null && value != null)
-                            dict[strKey] = value;
-                    }
-
-                    config.AddInMemoryCollection(dict);
+                    var strKey = key?.ToString();
+                    var value = envVars[key]?.ToString();
+                    if (strKey != null && value != null)
+                        dict[strKey] = value;
                 }
-            )
+
+                config.AddInMemoryCollection(dict);
+            })
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseKestrel(options =>
-                {
-                    options.Limits.MaxRequestBodySize = 1000 * 1024 * 1024; // 50 MB
-                    options.ListenAnyIP(8080);
-                });
-
                 webBuilder.UseStartup<Startup>();
             });
+
 }
 
 // You'll also need to create a Startup class
 public class Startup
 {
+    public IConfiguration Configuration { get; }
+
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
-    }
 
-    public IConfiguration Configuration { get; }
+        // Option 1: via Environment
+        var keyFromEnv = Environment.GetEnvironmentVariable("RAPID_API_KEY");
+        Console.WriteLine("From ENV: " + keyFromEnv);
+
+        // Option 2: via IConfiguration
+        var keyFromConfig = configuration["RAPID_API_KEY"];
+        Console.WriteLine("From IConfiguration: " + keyFromConfig);
+    }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -74,31 +68,23 @@ public class Startup
             options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
         });
 
-        services.AddCors(options =>
-        {
-            options.AddPolicy(
-                "AllowAll",
-                builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-            );
-        });
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+        );
 
         services.AddDbContextFactory<AppDbContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
         );
+
         services.AddControllers();
-        services.AddHttpClient();
         services.AddTransient<CsvService>();
-        services.AddScoped<AirbnbService>();
-        services.AddScoped<AirbnbListingsRetriever>();
-        services.AddScoped<AirBnBPriceRetriever>();
-        services.AddScoped<Controllers.AirbnbModule.AirbnbUtils>();
+        services.AddTransient<AirbnbService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseRouting();
         app.UseStaticFiles();
-        app.UseCors("AllowAll");
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
