@@ -9,6 +9,7 @@ namespace ABMB.Controllers;
 public class FlightDestination : ControllerBase
 {
     private readonly string apiKey = Environment.GetEnvironmentVariable("RAPID_API_KEY")!;
+
     [HttpGet("price-graph")]
     public async Task<IActionResult> GetPriceGraph(
         [FromQuery] string departure_id,
