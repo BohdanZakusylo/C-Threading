@@ -33,6 +33,16 @@ If you ran into any issues please don't hesitate to contact us.
 If you need to migrate something in the database run the following command
 docker exec -it abmb-webapi-1 dotnet ef database update
 
+## File to use:
+For flights, please use ABMB/Data/flights.csv
+For hotels, please use ABMB/Data/new_hotels.csv
+For airbnb, please use ABMB/Data/airbnb.csv
+
+## Params Data Sample (only for example)
+For flights, please use JFK - DFW , 16/04/2025, 18/04/2025, 1 passanger.
+For hotels please use Amsterdam, 16/06/2025, 18/06/2025.
+For airbnb, please use Turkey, Sapanca, 2025-08-7
+
 
 ## Authors
 Bernardo Alves, Mehdi Sadeghi, Bogdan , Ayomide
